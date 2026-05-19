@@ -1,0 +1,130 @@
+.projects {
+  padding: 6rem 3rem;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.label::before {
+  content: '';
+  width: 24px; height: 1px;
+  background: var(--amber);
+}
+
+.title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+
+.title em {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 300;
+  color: var(--text2);
+}
+
+.list { margin-top: 3rem; }
+
+.item {
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  gap: 2rem;
+  align-items: start;
+  padding: 2.5rem 0;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+  position: relative;
+}
+
+.item:first-child { border-top: 1px solid var(--border); }
+
+.item:hover { background: rgba(255,255,255,0.02); }
+.item:hover .arrow {
+  color: var(--amber);
+  transform: translate(3px, -3px);
+}
+
+.num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.1em;
+  padding-top: 0.3rem;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.type {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--amber);
+  padding: 0.2rem 0.6rem;
+  border: 1px solid rgba(232,160,32,0.3);
+}
+
+.desc {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.8;
+  max-width: 620px;
+  margin-bottom: 1rem;
+}
+
+.techs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tech {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.08em;
+  padding: 0.25rem 0.5rem;
+  background: var(--bg3);
+}
+
+.arrow {
+  font-size: 1.1rem;
+  color: var(--text3);
+  transition: color 0.2s, transform 0.2s;
+  padding-top: 0.3rem;
+  font-family: var(--mono);
+}
+
+@media (max-width: 768px) {
+  .projects { padding: 4rem 1.5rem; }
+  .item { grid-template-columns: 1fr auto; }
+  .num { display: none; }
+}
