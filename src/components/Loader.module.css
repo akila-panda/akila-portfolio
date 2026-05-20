@@ -1,0 +1,115 @@
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2rem var(--pad-x) 2.5rem;
+  overflow: hidden;
+  /* Ensure it renders above everything */
+  will-change: transform;
+}
+
+/* ── Top bar ── */
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.logo {
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  color: var(--text3);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+.counter {
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  color: var(--amber);
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Giant name ── */
+.nameRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+  overflow: hidden;
+  /* Clip the per-char overflow so they fly up from below */
+  padding-bottom: 0.08em;
+}
+
+.char {
+  display: block;
+  font-family: var(--display);
+  font-size: var(--t-hero);
+  font-weight: 800;
+  line-height: 0.88;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  user-select: none;
+  will-change: transform, opacity;
+}
+
+/* Last A gets amber accent */
+.char:last-child {
+  color: var(--amber);
+}
+
+/* ── Sub caption ── */
+.sub {
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  color: var(--text3);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  line-height: 1.8;
+}
+
+/* ── Progress line ── */
+.progressWrap {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.progressLine {
+  height: 100%;
+  width: 100%;
+  background: var(--amber);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+/* ── Mobile ── */
+@media (max-width: 600px) {
+  .loader { padding: 1.5rem 1.5rem 2rem; }
+}
+/* ── Blob exit overlay ── */
+.blobOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.blobFrame {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  will-change: opacity;
+}

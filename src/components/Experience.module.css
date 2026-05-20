@@ -102,3 +102,36 @@
   .experience { padding: 4rem 1.5rem; }
   .item { grid-template-columns: 1fr; gap: 1rem; }
 }
+
+/* Phase 4 additions */
+.timelineWrap {
+  position: relative;
+  margin-top: 3rem;
+}
+
+.timelineSvg {
+  position: absolute;
+  left: -1.5rem;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.timelineLine {
+  will-change: stroke-dashoffset;
+}
+
+.item {
+  will-change: transform, opacity;
+}
+
+.meta,
+.detail {
+  will-change: transform, opacity;
+}
+
+@media (max-width: 768px) {
+  .timelineSvg { display: none; }
+}

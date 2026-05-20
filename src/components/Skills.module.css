@@ -1,0 +1,238 @@
+/* src/components/Skills.module.css
+   Neural Constellation Tree — full visual system
+   ─────────────────────────────────────────────── */
+
+/* ── Section container ─────────────────────────────────────── */
+.skills {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #070c13;
+  margin-top: 3rem;
+}
+
+/* ── Radial glow bg — CSS custom props animated by GSAP ────── */
+.glowBg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse 55% 45% at var(--gx, 50%) var(--gy, 38%),
+      rgba(13, 31, 66, 0.85) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 80% 60% at 50% 50%,
+      rgba(8, 18, 40, 0.6) 0%,
+      transparent 100%
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── SVG connector lines ───────────────────────────────────── */
+.linesSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+
+.connectorLine {
+  /* Base opacity/width driven by GSAP attrs — see Skills.jsx */
+}
+
+/* ── Node base ─────────────────────────────────────────────── */
+.node {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  cursor: default;
+  user-select: none;
+  z-index: 2;
+  /* Idle float — each node has different timing via CSS vars */
+  animation: nodeFloat var(--float-dur, 3s) ease-in-out infinite alternate;
+  animation-delay: var(--float-delay, 0s);
+  /* Hardware compositing hint for smooth magnetic movement */
+  will-change: transform;
+  /* Smooth glow transition */
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+@keyframes nodeFloat {
+  from { transform: translate(0px, 0px) rotate(0deg); }
+  to   { transform: translate(1px, -5px) rotate(0.25deg); }
+}
+
+/* ── Root node ─────────────────────────────────────────────── */
+.rootNode {
+  background: #0c0906;
+  border: 1.5px solid rgba(232, 160, 32, 0.55);
+  flex-direction: column;
+  gap: 3px;
+  padding: 0 1rem;
+  animation-duration: 4s; /* slower float for root */
+}
+
+.rootNode:hover {
+  border-color: rgba(232, 160, 32, 0.9);
+  box-shadow:
+    0 0 0 1px rgba(232, 160, 32, 0.3),
+    0 0 20px rgba(232, 160, 32, 0.15),
+    inset 0 0 12px rgba(232, 160, 32, 0.05);
+}
+
+.rootLabel {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #e8a020;
+  line-height: 1;
+}
+
+.rootSub {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  color: rgba(232, 160, 32, 0.4);
+  line-height: 1;
+}
+
+/* ── Branch header nodes ───────────────────────────────────── */
+.branchNode {
+  background: rgba(8, 20, 30, 0.95);
+  border-color: color-mix(in srgb, var(--accent, #39d0d0) 30%, transparent);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent, #39d0d0);
+  transition:
+    box-shadow 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.branchNode:hover {
+  background: rgba(8, 20, 30, 1);
+  border-color: color-mix(in srgb, var(--accent, #39d0d0) 75%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent, #39d0d0) 35%, transparent),
+    0 0 18px color-mix(in srgb, var(--accent, #39d0d0) 18%, transparent),
+    inset 0 0 8px color-mix(in srgb, var(--accent, #39d0d0) 06%, transparent);
+}
+
+/* ── Leaf nodes ────────────────────────────────────────────── */
+.leafNode {
+  background: rgba(10, 14, 20, 0.9);
+  border-color: rgba(255, 255, 255, 0.06);
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(150, 165, 180, 0.75);
+  transition:
+    box-shadow 0.22s ease,
+    border-color 0.22s ease,
+    color 0.22s ease,
+    background 0.22s ease;
+}
+
+.leafNode:hover {
+  background: rgba(12, 20, 30, 0.98);
+  border-color: color-mix(in srgb, var(--accent, #39d0d0) 55%, transparent);
+  color: #fff;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent, #39d0d0) 28%, transparent),
+    0 0 14px color-mix(in srgb, var(--accent, #39d0d0) 14%, transparent);
+}
+
+/* ── Ambient particles ─────────────────────────────────────── */
+.particleLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: particleDrift var(--dur, 10s) ease-in-out infinite alternate;
+}
+
+@keyframes particleDrift {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  10%  { opacity: inherit; }
+  90%  { opacity: inherit; }
+  100% { transform: translate(var(--tx, 40px), var(--ty, -30px)); opacity: 0; }
+}
+
+/* ── Reduced motion ────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .node {
+    animation: none;
+    will-change: auto;
+  }
+  .particle {
+    animation: none;
+    display: none;
+  }
+}
+
+/* ── Mobile fallback — flat grid ───────────────────────────── */
+@media (max-width: 767px) {
+  .skills {
+    min-height: unset !important;
+    background: #070c13;
+    padding: 2rem 1.5rem;
+    border-radius: 8px;
+  }
+
+  /* Hide the constellation entirely on mobile */
+  .glowBg,
+  .linesSvg,
+  .particleLayer {
+    display: none;
+  }
+
+  /* Override absolute positioning */
+  .node {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    display: inline-flex;
+    padding: 0.35rem 0.75rem;
+    margin: 4px;
+    animation: none;
+    will-change: auto;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    padding: 2rem 1.5rem;
+  }
+
+  /* Show a simple stacked list */
+  .rootNode   { display: none; }
+  .branchNode { margin-top: 1.5rem; display: inline-flex; }
+  .leafNode   { font-size: 8px; }
+}

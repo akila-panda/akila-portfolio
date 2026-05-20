@@ -8,6 +8,31 @@
     <meta property="og:title" content="Akila Ranasinghe — Senior Frontend Developer" />
     <meta property="og:description" content="7+ years building things for the web. From Figma file to production-ready, optimised application." />
     <title>Akila Ranasinghe — Senior Frontend Developer</title>
+
+    <!-- Preconnect so font DNS+TLS happen in parallel with everything else -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!--
+      font-display=block: browser shows blank text (not fallback) while fonts load.
+      This eliminates the jarring FOUC / layout shift caused by fallback-font → web-font swap.
+      Trade-off: very brief invisible text (< 3s typical), which is far better than the
+      sudden font/layout jump mid-animation.
+    -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300&display=block"
+      rel="stylesheet"
+    />
+
+    <!--
+      Inline critical styles: hide everything until fonts + JS are ready.
+      The #root opacity:0 is removed by main.jsx after fonts are confirmed loaded.
+      This prevents any flash of unstyled / wrongly-laid-out content.
+    -->
+    <style>
+      html { background: #0a0a0a; }
+      #root { opacity: 0; transition: opacity 0.4s ease; }
+    </style>
   </head>
   <body>
     <div id="root"></div>

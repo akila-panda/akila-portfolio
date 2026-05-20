@@ -141,3 +141,14 @@
   .about { padding: 4rem 1.5rem; }
   .grid { grid-template-columns: 1fr; gap: 3rem; }
 }
+
+/* Phase 2 additions */
+.title .word,
+.title em .word {
+  display: inline-block;
+}
+
+.skillTag {
+  cursor: default;
+  will-change: transform;
+}
