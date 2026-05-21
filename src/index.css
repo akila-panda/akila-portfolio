@@ -166,3 +166,9 @@ button { cursor: none; border: none; background: none; font: inherit; }
   position: relative;
   height: 500vh; /* hero viewport + 4x scroll room for blob */
 }
+/* Hide custom cursor over iframe demo panels */
+body.cursor-hidden [class*="dot"],
+body.cursor-hidden [class*="ring"] {
+  opacity: 0 !important;
+  transition: opacity 0.15s;
+}

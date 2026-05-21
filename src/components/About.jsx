@@ -5,10 +5,10 @@ import Skills from './Skills'
 import styles from './About.module.css'
 
 const STATS = [
-  { value: 7,    suffix: '+', label: 'Years experience' },
+  { value: 7,    suffix: '+', label: 'Years Experience' },
   { value: 4,    suffix: '',  label: 'Companies' },
-  { value: 15,   suffix: '+', label: 'Projects shipped' },
-  { value: null, symbol: '∞', label: 'Tabs open' },
+  { value: 15,   suffix: '+', label: 'Projects Shipped' },
+  { value: 80, suffix: '+', label: 'Mobile Apps' },
 ]
 
 function AnimatedStat({ value, suffix = '', symbol, label, reduced }) {

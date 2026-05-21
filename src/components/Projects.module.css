@@ -315,3 +315,67 @@
   align-self: flex-start;
 }
 .drawerLink:hover { background: var(--amber2); }
+/* ── Drawer tabs ─────────────────────────────────────── */
+.drawerTabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border2);
+  margin-bottom: 1.75rem;
+}
+
+.drawerTab {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text3);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  margin-bottom: -1px;
+}
+.drawerTab:hover { color: var(--text); }
+.drawerTabActive {
+  color: var(--amber);
+  border-bottom-color: var(--amber);
+}
+
+/* ── Demo CTA button ─────────────────────────────────── */
+.drawerDemoBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #000;
+  background: var(--amber);
+  border: none;
+  padding: 0.85rem 2rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  align-self: flex-start;
+}
+.drawerDemoBtn:hover { background: var(--amber2, #d4880a); }
+
+/* ── Iframe demo panel ───────────────────────────────── */
+.drawerDemoWrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  margin: 0 -2rem -2rem;
+}
+
+.drawerIframe {
+  flex: 1;
+  width: 100%;
+  border: none;
+  min-height: 600px;
+  background: #fff;
+}

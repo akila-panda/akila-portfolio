@@ -154,10 +154,21 @@ export default function Nav() {
         ))}
       </ul>
 
-      <span ref={statusRef} className={styles.status}>
-        <span className={styles.dot} />
-        Open to work
-      </span>
+      <div className={styles.navRight}>
+        <a
+          href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/Akila_Ranasinghe_CV.pdf`}
+          download="Akila_Ranasinghe_CV.pdf"
+          className={styles.cvBtn}
+          data-cursor="hover"
+        >
+          Download CV
+        </a>
+
+        <span ref={statusRef} className={styles.status}>
+          <span className={styles.dot} />
+          Open to work
+        </span>
+      </div>
     </nav>
   )
 }

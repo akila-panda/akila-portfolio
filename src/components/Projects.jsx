@@ -8,18 +8,20 @@ const PROJECT_BG = [
   'linear-gradient(135deg,#e8a020 0%,#b36800 100%)',
   'linear-gradient(135deg,#1a1a2e 0%,#3dba7e 100%)',
   'linear-gradient(135deg,#2d1b69 0%,#7c3aed 100%)',
-  'linear-gradient(135deg,#1c1c1c 0%,#3a3530 100%)',
+  'linear-gradient(135deg,#0a0a0a 0%,#1a1a1a 100%)',
+  'linear-gradient(135deg,#3b1a0a 0%,#c8923a 100%)',
+  'linear-gradient(135deg,#0d2b1a 0%,#1a6b3a 100%)',
 ]
 
 export default function Projects() {
   const sectionRef    = useRef(null)
   const listRef       = useRef(null)
-  const previewRef    = useRef(null)
   const drawerRef     = useRef(null)
   const backdropRef   = useRef(null)
   const reducedMotion = useReducedMotion()
 
   const [active, setActive] = useState(null)   // project object or null
+  const [drawerTab, setDrawerTab] = useState('overview')  // 'overview' | 'demo'
 
   // ── Drawer open/close ───────────────────────────────────
   useEffect(() => {
@@ -28,6 +30,7 @@ export default function Projects() {
     if (!drawer) return
 
     if (active) {
+      setDrawerTab('overview')
       gsap.set(drawer, { display: 'flex' })
       gsap.set(backdrop, { display: 'block' })
       gsap.fromTo(drawer,
@@ -65,35 +68,22 @@ export default function Projects() {
     const isMobile = window.innerWidth < 768
     if (isMobile || reducedMotion) return
 
-    const preview = previewRef.current
-    const items   = listRef.current.querySelectorAll(`.${styles.item}`)
-    const xTo     = gsap.quickTo(preview, 'x', { duration: 0.55, ease: 'power3.out' })
-    const yTo     = gsap.quickTo(preview, 'y', { duration: 0.55, ease: 'power3.out' })
-
-    gsap.set(preview, { opacity: 0, scale: 0.88 })
-
+    const items    = listRef.current.querySelectorAll(`.${styles.item}`)
     const handlers = []
 
     items.forEach((item, i) => {
-      const bg = PROJECT_BG[i] || PROJECT_BG[0]
-
       const onEnter = () => {
-        preview.style.background = bg
-        gsap.to(preview, { opacity: 1, scale: 1, duration: 0.35, ease: 'expo.out', overwrite: 'auto' })
         gsap.to(item.querySelector(`.${styles.num}`),   { color: 'var(--amber)', duration: 0.2, overwrite: 'auto' })
         gsap.to(item.querySelector(`.${styles.arrow}`), { x: 4, y: -4, color: 'var(--amber)', duration: 0.25, overwrite: 'auto' })
       }
       const onLeave = () => {
-        gsap.to(preview, { opacity: 0, scale: 0.88, duration: 0.25, ease: 'power2.in', overwrite: 'auto' })
         gsap.to(item.querySelector(`.${styles.num}`),   { color: 'var(--text3)', duration: 0.2, overwrite: 'auto' })
         gsap.to(item.querySelector(`.${styles.arrow}`), { x: 0, y: 0, color: 'var(--text3)', duration: 0.2, overwrite: 'auto' })
       }
-      const onMove = (e) => { xTo(e.clientX - 140); yTo(e.clientY - 185) }
 
       item.addEventListener('mouseenter', onEnter)
       item.addEventListener('mouseleave', onLeave)
-      item.addEventListener('mousemove', onMove, { passive: true })
-      handlers.push({ item, onEnter, onLeave, onMove })
+      handlers.push({ item, onEnter, onLeave })
     })
 
     const ctx = gsap.context(() => {
@@ -111,19 +101,15 @@ export default function Projects() {
 
     return () => {
       ctx.revert()
-      handlers.forEach(({ item, onEnter, onLeave, onMove }) => {
+      handlers.forEach(({ item, onEnter, onLeave }) => {
         item.removeEventListener('mouseenter', onEnter)
         item.removeEventListener('mouseleave', onLeave)
-        item.removeEventListener('mousemove', onMove)
       })
     }
   }, [reducedMotion])
 
   return (
     <section ref={sectionRef} className={styles.projects} id="projects">
-
-      {/* ── Hover preview ── */}
-      <div ref={previewRef} className={styles.preview} aria-hidden="true" />
 
       {/* ── Backdrop ── */}
       <div
@@ -155,28 +141,64 @@ export default function Projects() {
             </div>
 
             <div className={styles.drawerBody}>
-              <div className={styles.drawerMeta}>
-                <span className={styles.drawerType}>{active.type}</span>
-              </div>
-              <h3 className={styles.drawerName}>{active.name}</h3>
-              <p className={styles.drawerDesc}>{active.desc}</p>
+              {/* Tab bar — only shown when a demo exists */}
+              {active.demo && (
+                <div className={styles.drawerTabs}>
+                  <button
+                    className={`${styles.drawerTab} ${drawerTab === 'overview' ? styles.drawerTabActive : ''}`}
+                    onClick={() => setDrawerTab('overview')}
+                  >
+                    Overview
+                  </button>
+                  <button
+                    className={`${styles.drawerTab} ${drawerTab === 'demo' ? styles.drawerTabActive : ''}`}
+                    onClick={() => setDrawerTab('demo')}
+                  >
+                    Live Demo ↗
+                  </button>
+                </div>
+              )}
 
-              <div className={styles.drawerTechsLabel}>Stack</div>
-              <div className={styles.drawerTechs}>
-                {active.techs.map(t => (
-                  <span key={t} className={styles.drawerTech}>{t}</span>
-                ))}
-              </div>
+              {/* Overview panel */}
+              {drawerTab === 'overview' && (
+                <>
+                  <div className={styles.drawerMeta}>
+                    <span className={styles.drawerType}>{active.type}</span>
+                  </div>
+                  <h3 className={styles.drawerName}>{active.name}</h3>
+                  <p className={styles.drawerDesc}>{active.desc}</p>
+                  <div className={styles.drawerTechsLabel}>Stack</div>
+                  <div className={styles.drawerTechs}>
+                    {active.techs.map(t => (
+                      <span key={t} className={styles.drawerTech}>{t}</span>
+                    ))}
+                  </div>
+                  {active.demo && (
+                    <button
+                      className={styles.drawerDemoBtn}
+                      onClick={() => setDrawerTab('demo')}
+                    >
+                      Try the Tool <span>↗</span>
+                    </button>
+                  )}
+                </>
+              )}
 
-              {active.url && (
-                <a
-                  href={active.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.drawerLink}
+              {/* Demo panel */}
+              {drawerTab === 'demo' && active.demo && (
+                <div
+                  className={styles.drawerDemoWrap}
+                  onMouseEnter={() => document.body.classList.add('cursor-hidden')}
+                  onMouseLeave={() => document.body.classList.remove('cursor-hidden')}
                 >
-                  Visit Project <span>↗</span>
-                </a>
+                  <iframe
+                    src={`${import.meta.env.BASE_URL.replace(/\/$/, '')}${active.demo}`}
+                    className={styles.drawerIframe}
+                    title={`${active.name} — Live Demo`}
+                    loading="lazy"
+                    sandbox="allow-scripts allow-same-origin allow-downloads"
+                  />
+                </div>
               )}
             </div>
           </>
@@ -211,7 +233,7 @@ export default function Projects() {
                   ))}
                 </div>
               </div>
-              <span className={styles.arrow} style={{ opacity: p.url ? 1 : 0.25 }}>↗</span>
+              <span className={styles.arrow}>↗</span>
             </div>
             <div className={styles.divider} />
           </div>

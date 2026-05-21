@@ -1,0 +1,2496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SolTrim Label Mockup Designer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root {
+  --teal:       #1a5f7a;
+  --teal-dark:  #0e3d50;
+  --teal-light: #2a7fa0;
+  --teal-pale:  #eaf4f9;
+  --gold:       #f5a623;
+  --gold-dark:  #d4880a;
+  --gold-light: #ffc85a;
+  --bg:         #f0f4f7;
+  --surface:    #ffffff;
+  --surface2:   #f7fafc;
+  --border:     #dce6ed;
+  --text:       #1a2e3b;
+  --muted:      #6b8899;
+  --radius:     16px;
+  --radius-sm:  10px;
+  --shadow:     0 4px 24px rgba(26,95,122,0.10);
+  --shadow-lg:  0 12px 48px rgba(26,95,122,0.16);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+.header {
+  background: var(--teal-dark);
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  position: sticky; top: 0; z-index: 50;
+}
+.header-logo { display:flex; align-items:center; gap:10px; }
+.sun-icon { width:38px; height:38px; }
+.logo-text { font-family:'DM Sans',sans-serif; font-size:22px; font-weight:700; color:#fff; letter-spacing:-0.5px; }
+.logo-text span { color:var(--gold); }
+.logo-sub { font-size:9px; letter-spacing:2px; color:rgba(255,255,255,0.55); text-transform:uppercase; display:block; margin-top:-3px; }
+.header-right {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 10px;
+  color: rgba(255,255,255,0.85); font-size:14px; font-weight:500;
+}
+.live-dot { width:8px; height:8px; background:#4cde80; border-radius:50%; display:inline-block; animation:pulse 1.5s ease-in-out infinite; margin-right:5px; }
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.badge { background:var(--gold); color:var(--teal-dark); font-size:10px; font-weight:700; padding:3px 10px; border-radius:20px; letter-spacing:0.5px; text-transform:uppercase; }
+
+.designer-wrap { max-width:1280px; margin:0 auto; padding:32px 24px 48px; }
+.page-title-bar { display:flex; align-items:center; gap:14px; margin-bottom:24px; }
+.page-title-bar h1 { font-family:'DM Serif Display',serif; font-size:28px; color:var(--teal-dark); line-height:1.1; }
+.page-title-bar h1 em { font-style:italic; color:var(--teal); }
+.page-title-bar p { font-size:13px; color:var(--muted); margin-top:3px; }
+.designer-grid { display:grid; grid-template-columns:340px 1fr; gap:24px; align-items:start; }
+@media(max-width:900px){ .designer-grid{grid-template-columns:1fr;} }
+
+.panel { background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+.panel-header { background:linear-gradient(135deg,var(--teal) 0%,var(--teal-dark) 100%); padding:14px 20px; display:flex; align-items:center; gap:10px; }
+.panel-header-icon { width:28px; height:28px; background:rgba(255,255,255,0.15); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:14px; }
+.panel-header h3 { color:#fff; font-size:13px; font-weight:600; letter-spacing:0.3px; text-transform:uppercase; }
+.panel-body { padding:0; max-height:700px; overflow-y:auto; }
+.panel-body::-webkit-scrollbar{width:4px;}
+.panel-body::-webkit-scrollbar-track{background:transparent;}
+.panel-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+.ctrl-tabs { display:flex; border-bottom:2px solid var(--border); padding:0 20px; margin-bottom:0; }
+.ctrl-tab { padding:10px 14px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; color:var(--muted); transition:all 0.2s; font-family:'DM Sans',sans-serif; background:none; border-top:none; border-left:none; border-right:none; }
+.ctrl-tab.active { border-bottom-color:var(--gold); color:var(--teal-dark); }
+.ctrl-tab-content { display:none; padding:20px; }
+.ctrl-tab-content.active { display:block; }
+
+.ctrl-section { margin-bottom:22px; }
+.ctrl-section:last-child { margin-bottom:0; }
+.ctrl-label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+.ctrl-label::before { content:''; display:inline-block; width:3px; height:12px; background:var(--gold); border-radius:2px; }
+
+.type-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.type-pill { border:2px solid var(--border); border-radius:var(--radius-sm); padding:10px 8px; text-align:center; cursor:pointer; transition:all 0.2s; background:var(--surface2); }
+.type-pill:hover { border-color:var(--teal-light); background:var(--teal-pale); }
+.type-pill.active { border-color:var(--teal); background:linear-gradient(135deg,var(--teal-pale),#d6edf5); box-shadow:0 0 0 3px rgba(26,95,122,0.08); }
+.type-pill-icon { font-size:22px; margin-bottom:4px; }
+.type-pill-name { font-size:11px; font-weight:600; color:var(--teal-dark); }
+.type-pill-desc { font-size:10px; color:var(--muted); margin-top:2px; }
+
+.size-grid { display:flex; flex-wrap:wrap; gap:7px; }
+.size-btn { border:2px solid var(--border); border-radius:8px; padding:6px 12px; font-size:12px; font-weight:600; cursor:pointer; background:var(--surface2); color:var(--text); transition:all 0.2s; font-family:'DM Sans',sans-serif; }
+.size-btn:hover { border-color:var(--teal); }
+.size-btn.active { border-color:var(--teal); background:var(--teal); color:#fff; }
+
+.orientation-btns { display:flex; gap:7px; }
+.orient-btn { border:2px solid var(--border); border-radius:8px; padding:7px 14px; font-size:12px; font-weight:600; cursor:pointer; background:var(--surface2); color:var(--text); transition:all 0.2s; font-family:'DM Sans',sans-serif; display:flex; align-items:center; gap:5px; }
+.orient-btn.active { border-color:var(--teal); background:var(--teal); color:#fff; }
+
+.color-row { display:flex; gap:8px; flex-wrap:wrap; }
+.color-swatch { width:28px; height:28px; border-radius:50%; cursor:pointer; border:3px solid transparent; transition:all 0.15s; box-shadow:0 2px 6px rgba(0,0,0,0.15); }
+.color-swatch.active { border-color:var(--teal); transform:scale(1.15); }
+.color-swatch.custom { background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red); position:relative; overflow:hidden; }
+.color-swatch.custom input[type=color] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+
+.material-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; }
+.material-btn { border:2px solid var(--border); border-radius:8px; padding:8px 6px; text-align:center; cursor:pointer; font-size:10px; font-weight:600; color:var(--text); background:var(--surface2); transition:all 0.2s; font-family:'DM Sans',sans-serif; }
+.material-btn:hover { border-color:var(--teal); }
+.material-btn.active { border-color:var(--teal); background:var(--teal); color:#fff; }
+.material-icon { font-size:16px; margin-bottom:3px; }
+
+.care-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
+.care-btn { border:2px solid var(--border); border-radius:8px; padding:6px 4px; text-align:center; cursor:pointer; background:var(--surface2); transition:all 0.2s; position:relative; display:flex; flex-direction:column; align-items:center; gap:2px; }
+.care-btn:hover { border-color:var(--teal-light); }
+.care-btn.active { border-color:var(--teal); background:var(--teal-pale); }
+.care-btn svg { display:block; }
+.care-btn-label { font-size:7px; font-weight:600; color:var(--muted); line-height:1.1; text-align:center; }
+
+.upload-zone { border:2px dashed var(--border); border-radius:var(--radius-sm); padding:20px; text-align:center; cursor:pointer; transition:all 0.2s; background:var(--surface2); position:relative; }
+.upload-zone:hover,.upload-zone.drag-over { border-color:var(--teal); background:var(--teal-pale); }
+.upload-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+.upload-icon { font-size:28px; margin-bottom:6px; }
+.upload-hint { font-size:12px; color:var(--muted); }
+.upload-hint strong { color:var(--teal); }
+.upload-preview { display:none; align-items:center; gap:10px; padding:8px; background:var(--teal-pale); border-radius:8px; margin-top:8px; }
+.upload-preview img { width:40px; height:40px; object-fit:contain; border-radius:4px; background:#fff; padding:2px; }
+.upload-preview-name { font-size:12px; font-weight:600; color:var(--teal-dark); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:160px; }
+.remove-logo { margin-left:auto; background:none; border:none; color:#e05252; cursor:pointer; font-size:16px; padding:2px 6px; border-radius:4px; }
+.remove-logo:hover { background:#fee; }
+
+.ctrl-input { width:100%; border:2px solid var(--border); border-radius:8px; padding:9px 12px; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--text); background:var(--surface2); transition:border 0.2s; outline:none; }
+.ctrl-input:focus { border-color:var(--teal); background:#fff; }
+.ctrl-textarea { width:100%; border:2px solid var(--border); border-radius:8px; padding:9px 12px; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--text); background:var(--surface2); transition:border 0.2s; outline:none; resize:vertical; min-height:72px; line-height:1.5; }
+.ctrl-textarea:focus { border-color:var(--teal); background:#fff; }
+
+/* Rich text toolbar */
+.rt-toolbar { display:flex; gap:4px; margin-bottom:6px; flex-wrap:wrap; }
+.rt-btn { border:2px solid var(--border); border-radius:6px; padding:4px 8px; font-size:12px; font-weight:600; cursor:pointer; background:var(--surface2); color:var(--text); font-family:'DM Sans',sans-serif; transition:all 0.15s; line-height:1; }
+.rt-btn.active { border-color:var(--teal); background:var(--teal-pale); color:var(--teal-dark); }
+
+.slider-row { display:flex; align-items:center; gap:10px; }
+.ctrl-range { flex:1; -webkit-appearance:none; height:4px; border-radius:2px; background:var(--border); outline:none; cursor:pointer; }
+.ctrl-range::-webkit-slider-thumb { -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:var(--teal); cursor:pointer; box-shadow:0 2px 6px rgba(26,95,122,0.3); }
+.range-val { font-size:12px; font-weight:600; color:var(--teal); min-width:32px; text-align:right; }
+
+.toggle-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.toggle-label { font-size:12px; font-weight:500; color:var(--text); }
+.toggle { width:36px; height:20px; background:var(--border); border-radius:20px; cursor:pointer; position:relative; transition:background 0.2s; }
+.toggle.on { background:var(--teal); }
+.toggle::after { content:''; position:absolute; top:3px; left:3px; width:14px; height:14px; background:#fff; border-radius:50%; transition:transform 0.2s; box-shadow:0 1px 4px rgba(0,0,0,0.2); }
+.toggle.on::after { transform:translateX(16px); }
+
+.font-grid { display:flex; gap:6px; flex-wrap:wrap; }
+.font-btn { border:2px solid var(--border); border-radius:8px; padding:5px 10px; cursor:pointer; font-size:13px; background:var(--surface2); transition:all 0.2s; color:var(--text); }
+.font-btn:hover { border-color:var(--teal); }
+.font-btn.active { border-color:var(--teal); background:var(--teal-pale); }
+
+.divider { height:1px; background:var(--border); margin:18px 0; }
+[data-tip]{position:relative;cursor:pointer;}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--teal-dark);color:#fff;font-size:10px;padding:4px 8px;border-radius:5px;white-space:nowrap;z-index:100;pointer-events:none;font-family:'DM Sans',sans-serif;}
+
+.preview-panel { display:flex; flex-direction:column; gap:20px; }
+.preview-card { background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+
+.view-tabs { display:flex; gap:0; padding:14px 20px 0; }
+.view-tab { padding:8px 16px; font-size:12px; font-weight:600; cursor:pointer; border-bottom:2px solid transparent; color:var(--muted); transition:all 0.2s; }
+.view-tab.active { border-bottom-color:var(--teal); color:var(--teal); }
+
+.preview-stage {
+  background:linear-gradient(135deg,#e8f4f8 0%,#d4eaf3 50%,#c8e3ef 100%);
+  min-height:420px; display:flex; align-items:center; justify-content:center;
+  position:relative; padding:40px; overflow:hidden;
+}
+.preview-stage::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 70% 30%,rgba(26,95,122,0.06) 0%,transparent 60%); }
+.preview-garment { position:absolute; inset:0; opacity:0.06; background-image:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(26,95,122,0.5) 2px,rgba(26,95,122,0.5) 4px); }
+.label-canvas-wrap { position:relative; display:flex; align-items:center; justify-content:center; }
+.label-shadow { position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); width:80%; height:16px; background:radial-gradient(ellipse,rgba(0,0,0,0.25) 0%,transparent 70%); border-radius:50%; filter:blur(4px); }
+#label-canvas { display:block; border-radius:4px; cursor:grab; transition:box-shadow 0.2s; box-shadow:0 6px 28px rgba(0,0,0,0.18),0 2px 8px rgba(0,0,0,0.1); }
+#label-canvas:active { cursor:grabbing; }
+
+.preview-info-bar { display:flex; align-items:center; padding:12px 20px; background:var(--surface2); border-top:1px solid var(--border); gap:12px; flex-wrap:wrap; }
+.info-chip { display:flex; align-items:center; gap:5px; background:#fff; border:1px solid var(--border); border-radius:20px; padding:4px 12px; font-size:11px; font-weight:600; color:var(--teal); }
+.info-chip-dot { width:7px; height:7px; border-radius:50%; background:var(--gold); }
+
+.action-bar { display:flex; gap:10px; padding:16px 20px; background:var(--surface); border-top:1px solid var(--border); flex-wrap:wrap; align-items:center; }
+
+.placement-views { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; padding:16px 20px; }
+.placement-view { background:var(--surface2); border-radius:var(--radius-sm); padding:12px; text-align:center; border:2px solid var(--border); cursor:pointer; transition:all 0.2s; }
+.placement-view:hover { border-color:var(--teal-light); }
+.placement-view.active { border-color:var(--teal); background:var(--teal-pale); }
+.placement-view-img { width:100%; height:80px; background:#e2ecf2; border-radius:6px; margin-bottom:6px; display:flex; align-items:center; justify-content:center; font-size:28px; }
+.placement-name { font-size:11px; font-weight:600; color:var(--teal-dark); }
+
+.specs-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:16px 20px; background:var(--surface2); border-top:1px solid var(--border); }
+.spec-label { font-size:10px; text-transform:uppercase; letter-spacing:0.8px; color:var(--muted); font-weight:600; margin-bottom:3px; }
+.spec-value { font-size:13px; font-weight:700; color:var(--teal-dark); }
+
+.summary-bar { background:linear-gradient(135deg,var(--teal-dark) 0%,var(--teal) 100%); border-radius:var(--radius); padding:16px 20px; display:flex; align-items:center; gap:16px; box-shadow:var(--shadow-lg); }
+.summary-bar p { color:rgba(255,255,255,0.8); font-size:12px; line-height:1.5; }
+.summary-bar strong { color:var(--gold-light); }
+.summary-icon { font-size:32px; flex-shrink:0; }
+
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:10px 20px; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; cursor:pointer; border:none; transition:all 0.2s; text-decoration:none; }
+.btn-primary { background:linear-gradient(135deg,var(--teal) 0%,var(--teal-dark) 100%); color:#fff; box-shadow:0 4px 14px rgba(26,95,122,0.3); }
+.btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(26,95,122,0.4); }
+.btn-secondary { background:var(--surface2); color:var(--teal); border:2px solid var(--border); }
+.btn-secondary:hover { border-color:var(--teal); background:var(--teal-pale); }
+.btn-gold { background:linear-gradient(135deg,var(--gold) 0%,#e8940a 100%); color:var(--teal-dark); box-shadow:0 4px 14px rgba(245,166,35,0.35); }
+.btn-gold:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(245,166,35,0.45); }
+.btn-pro { background:linear-gradient(135deg,#2d1b6e 0%,#1a0f40 100%); color:#fff; box-shadow:0 4px 14px rgba(45,27,110,0.3); position:relative; overflow:hidden; }
+.btn-pro::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(245,166,35,0.15) 0%,transparent 60%); pointer-events:none; }
+.btn-pro:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(45,27,110,0.42); }
+
+#adv-modal-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(10,30,40,0.72); z-index:1000;
+  align-items:center; justify-content:center;
+  backdrop-filter:blur(6px); padding:16px;
+}
+#adv-modal-overlay.open { display:flex; }
+#adv-modal {
+  background:var(--bg); border-radius:20px; box-shadow:0 32px 80px rgba(0,0,0,0.35);
+  width:100%; max-width:1220px; height:calc(100vh - 40px); max-height:860px;
+  display:flex; flex-direction:column; overflow:hidden;
+  animation:modalIn 0.28s cubic-bezier(0.22,1,0.36,1);
+}
+@keyframes modalIn{from{opacity:0;transform:scale(0.96) translateY(10px)}to{opacity:1;transform:none}}
+
+.adv-modal-head {
+  background:linear-gradient(135deg,var(--teal-dark) 0%,#0a2535 100%);
+  padding:14px 22px; display:flex; align-items:center; gap:14px;
+  flex-shrink:0; border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.adv-modal-title { color:#fff; font-family:'DM Serif Display',serif; font-size:18px; }
+.adv-modal-title span { color:var(--gold); }
+.adv-modal-badge { background:rgba(245,166,35,0.18); border:1px solid rgba(245,166,35,0.3); color:var(--gold-light); font-size:10px; font-weight:700; padding:3px 9px; border-radius:20px; letter-spacing:0.5px; text-transform:uppercase; }
+.adv-modal-close { margin-left:auto; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); color:rgba(255,255,255,0.7); width:34px; height:34px; border-radius:8px; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; transition:all 0.15s; font-family:'DM Sans',sans-serif; }
+.adv-modal-close:hover { background:rgba(255,255,255,0.15); color:#fff; }
+.adv-modal-body { display:grid; grid-template-columns:300px 1fr; flex:1; overflow:hidden; }
+
+.adv-left { background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; }
+.adv-tabs { display:flex; border-bottom:2px solid var(--border); flex-shrink:0; }
+.adv-tab { flex:1; padding:10px 4px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; color:var(--muted); border-bottom:2px solid transparent; margin-bottom:-2px; text-align:center; transition:all 0.18s; font-family:'DM Sans',sans-serif; background:none; border-top:none; border-left:none; border-right:none; }
+.adv-tab.active { border-bottom-color:var(--gold); color:var(--teal-dark); }
+.adv-tab-content { display:none; flex:1; overflow-y:auto; padding:16px; }
+.adv-tab-content.active { display:block; }
+
+.adv-label { font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:8px; display:flex; align-items:center; gap:5px; }
+.adv-label::before { content:''; display:inline-block; width:3px; height:10px; background:var(--gold); border-radius:2px; }
+.adv-section { margin-bottom:18px; }
+.adv-section:last-child { margin-bottom:0; }
+.adv-divider { height:1px; background:var(--border); margin:14px 0; }
+
+.adv-type-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+.adv-pill { border:2px solid var(--border); border-radius:9px; padding:7px 4px; text-align:center; cursor:pointer; background:var(--surface2); transition:all 0.16s; }
+.adv-pill:hover { border-color:var(--teal-light); }
+.adv-pill.active { border-color:var(--teal); background:var(--teal-pale); }
+.adv-pill-icon { font-size:16px; margin-bottom:2px; }
+.adv-pill-name { font-size:10px; font-weight:600; color:var(--teal-dark); }
+
+.adv-size-row { display:flex; flex-wrap:wrap; gap:5px; }
+.adv-size-btn { border:2px solid var(--border); border-radius:7px; padding:4px 9px; font-size:10px; font-weight:600; cursor:pointer; background:var(--surface2); color:var(--text); font-family:'DM Sans',sans-serif; transition:all 0.15s; }
+.adv-size-btn:hover { border-color:var(--teal); }
+.adv-size-btn.active { border-color:var(--teal); background:var(--teal); color:#fff; }
+
+.adv-orient-row { display:flex; gap:6px; margin-top:7px; }
+.adv-orient-btn { border:2px solid var(--border); border-radius:8px; padding:5px 12px; font-size:11px; font-weight:600; cursor:pointer; background:var(--surface2); color:var(--text); font-family:'DM Sans',sans-serif; transition:all 0.15s; }
+.adv-orient-btn.active { border-color:var(--teal); background:var(--teal); color:#fff; }
+
+.adv-mat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; }
+.adv-mat-btn { border:2px solid var(--border); border-radius:8px; padding:6px 4px; text-align:center; cursor:pointer; font-size:9px; font-weight:600; color:var(--text); background:var(--surface2); font-family:'DM Sans',sans-serif; transition:all 0.15s; }
+.adv-mat-btn:hover { border-color:var(--teal); }
+.adv-mat-btn.active { border-color:var(--teal); background:var(--teal); color:#fff; }
+.adv-mat-icon { font-size:14px; margin-bottom:2px; }
+
+.adv-border-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; }
+.adv-border-btn { border:2px solid var(--border); border-radius:8px; padding:6px 4px; text-align:center; cursor:pointer; font-size:9px; font-weight:600; color:var(--text); background:var(--surface2); font-family:'DM Sans',sans-serif; transition:all 0.15s; }
+.adv-border-btn:hover { border-color:var(--teal); }
+.adv-border-btn.active { border-color:var(--teal); background:var(--teal); color:#fff; }
+
+.adv-color-row { display:flex; flex-wrap:wrap; gap:7px; }
+.adv-swatch { width:26px; height:26px; border-radius:50%; cursor:pointer; border:3px solid transparent; transition:all 0.15s; box-shadow:0 2px 5px rgba(0,0,0,0.14); flex-shrink:0; }
+.adv-swatch.active { border-color:var(--teal); transform:scale(1.18); }
+.adv-swatch.custom-swatch { background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red); position:relative; overflow:hidden; }
+.adv-swatch.custom-swatch input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+
+.adv-slider-row { display:flex; align-items:center; gap:9px; }
+.adv-range { flex:1; -webkit-appearance:none; height:4px; border-radius:2px; background:var(--border); outline:none; cursor:pointer; }
+.adv-range::-webkit-slider-thumb { -webkit-appearance:none; width:15px; height:15px; border-radius:50%; background:var(--teal); cursor:pointer; box-shadow:0 2px 5px rgba(26,95,122,0.3); }
+.adv-range-val { font-size:11px; font-weight:600; color:var(--teal); min-width:34px; text-align:right; }
+
+.adv-input { width:100%; border:2px solid var(--border); border-radius:8px; padding:8px 10px; font-family:'DM Sans',sans-serif; font-size:12px; color:var(--text); background:var(--surface2); outline:none; transition:border 0.18s; }
+.adv-input:focus { border-color:var(--teal); background:#fff; }
+
+.adv-toggle-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:9px; }
+.adv-toggle-label { font-size:12px; font-weight:500; color:var(--text); }
+.adv-toggle { width:34px; height:18px; background:var(--border); border-radius:18px; cursor:pointer; position:relative; transition:background 0.2s; flex-shrink:0; }
+.adv-toggle.on { background:var(--teal); }
+.adv-toggle::after { content:''; position:absolute; top:2px; left:2px; width:14px; height:14px; background:#fff; border-radius:50%; transition:transform 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2); }
+.adv-toggle.on::after { transform:translateX(16px); }
+
+.adv-font-row { display:flex; gap:5px; flex-wrap:wrap; }
+.adv-font-btn { border:2px solid var(--border); border-radius:7px; padding:4px 10px; font-size:12px; cursor:pointer; background:var(--surface2); color:var(--text); transition:all 0.15s; }
+.adv-font-btn.active { border-color:var(--teal); background:var(--teal-pale); }
+
+.adv-rt-toolbar { display:flex; gap:4px; margin-bottom:6px; flex-wrap:wrap; }
+.adv-rt-btn { border:2px solid var(--border); border-radius:6px; padding:4px 8px; font-size:12px; font-weight:600; cursor:pointer; background:var(--surface2); color:var(--text); font-family:'DM Sans',sans-serif; transition:all 0.15s; line-height:1; }
+.adv-rt-btn.active { border-color:var(--teal); background:var(--teal-pale); color:var(--teal-dark); }
+.adv-rt-area { width:100%; min-height:52px; border:2px solid var(--border); border-radius:8px; padding:8px 10px; font-family:'DM Sans',sans-serif; font-size:12px; color:var(--text); background:var(--surface2); outline:none; resize:vertical; transition:border 0.18s; line-height:1.5; }
+.adv-rt-area:focus { border-color:var(--teal); background:#fff; }
+
+.adv-care-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
+.adv-care-btn { border:2px solid var(--border); border-radius:8px; padding:6px 3px; text-align:center; cursor:pointer; background:var(--surface2); transition:all 0.16s; display:flex; flex-direction:column; align-items:center; gap:1px; }
+.adv-care-btn:hover { border-color:var(--teal-light); }
+.adv-care-btn.active { border-color:var(--teal); background:var(--teal-pale); }
+.adv-care-btn svg { display:block; margin:0 auto; }
+.adv-care-name { font-size:7px; font-weight:600; color:var(--muted); line-height:1.1; text-align:center; }
+
+.adv-block-list { display:flex; flex-direction:column; gap:6px; }
+.adv-block-item { display:flex; align-items:center; gap:8px; padding:8px 10px; background:var(--surface2); border:2px solid var(--border); border-radius:9px; cursor:grab; transition:all 0.16s; }
+.adv-block-item:hover { border-color:var(--teal-light); background:var(--teal-pale); }
+.adv-block-item.dragging { opacity:0.4; border-style:dashed; }
+.adv-block-item.drag-over { border-color:var(--teal); background:var(--teal-pale); }
+.adv-block-drag { color:var(--muted); font-size:14px; cursor:grab; }
+.adv-block-label { font-size:11px; font-weight:600; color:var(--teal-dark); flex:1; }
+
+.adv-right { display:flex; flex-direction:column; overflow:hidden; background:var(--bg); }
+.adv-preview-stage {
+  flex:1; background:linear-gradient(145deg,#daeaf3 0%,#c8dfe9 50%,#b8d4e2 100%);
+  display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;
+}
+.adv-preview-stage::before { content:''; position:absolute; inset:0; background-image:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(26,95,122,0.022) 3px,rgba(26,95,122,0.022) 4px); }
+.adv-garment-svg { position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:320px; opacity:0.14; }
+.adv-canvas-wrap { position:relative; z-index:3; display:flex; flex-direction:column; align-items:center; gap:8px; }
+#adv-canvas { display:block; box-shadow:0 10px 40px rgba(0,0,0,0.22),0 2px 8px rgba(0,0,0,0.1); }
+.adv-canvas-shadow { width:65%; height:14px; background:radial-gradient(ellipse,rgba(0,0,0,0.2) 0%,transparent 70%); filter:blur(4px); border-radius:50%; margin-top:-4px; }
+.adv-preview-info { display:flex; flex-wrap:wrap; gap:6px; padding:10px 16px; background:var(--surface); border-top:1px solid var(--border); }
+.adv-chip { display:flex; align-items:center; gap:4px; background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:3px 10px; font-size:10px; font-weight:600; color:var(--teal); }
+.adv-chip-dot { width:6px; height:6px; border-radius:50%; background:var(--gold); }
+.adv-action-bar { display:flex; gap:8px; padding:12px 16px; background:var(--surface); border-top:1px solid var(--border); flex-shrink:0; }
+.adv-action-bar .btn { width:auto; flex:1; }
+
+/* Adv view tabs */
+.adv-view-tabs { display:flex; gap:0; padding:10px 16px 0; background:var(--surface); border-bottom:1px solid var(--border); flex-shrink:0; }
+.adv-view-tab { padding:7px 14px; font-size:11px; font-weight:600; cursor:pointer; border-bottom:2px solid transparent; color:var(--muted); transition:all 0.2s; margin-bottom:-1px; }
+.adv-view-tab.active { border-bottom-color:var(--teal); color:var(--teal); }
+
+/* Quote preview image */
+.quote-preview-wrap { display:flex; gap:16px; margin-bottom:14px; }
+.quote-preview-canvas { border-radius:8px; box-shadow:0 4px 18px rgba(0,0,0,0.15); flex-shrink:0; max-height:160px; }
+.quote-specs-inline { flex:1; background:var(--surface2); border-radius:8px; padding:12px; font-size:11px; line-height:1.8; color:var(--text); border:1px solid var(--border); overflow-y:auto; max-height:160px; }
+.quote-specs-inline b { color:var(--teal-dark); }
+
+/* Care reorder list */
+.adv-care-active-list { display:flex; flex-direction:column; gap:5px; margin-top:10px; }
+.adv-care-active-item { display:flex; align-items:center; gap:8px; padding:5px 8px; background:var(--surface2); border:2px solid var(--border); border-radius:8px; cursor:grab; transition:all 0.16s; }
+.adv-care-active-item:hover { border-color:var(--teal-light); }
+.adv-care-active-item.dragging { opacity:0.4; border-style:dashed; }
+.adv-care-active-item.drag-over { border-color:var(--teal); background:var(--teal-pale); }
+.adv-care-active-drag { color:var(--muted); font-size:13px; }
+.adv-care-active-name { font-size:10px; font-weight:600; color:var(--teal-dark); flex:1; }
+.adv-care-remove { background:none; border:none; color:#e05252; cursor:pointer; font-size:13px; padding:1px 4px; border-radius:4px; }
+
+/* Block rich text toolbar */
+.block-rt-bar { display:flex; gap:3px; margin-bottom:4px; }
+.block-rt-btn { border:1.5px solid var(--border); border-radius:5px; padding:2px 6px; font-size:10px; font-weight:700; cursor:pointer; background:var(--surface2); color:var(--text); font-family:'DM Sans',sans-serif; line-height:1.3; }
+.block-rt-btn.active { border-color:var(--teal); background:var(--teal-pale); color:var(--teal-dark); }
+
+/* Care block in content blocks list */
+.adv-block-care { background:var(--teal-pale) !important; border-color:rgba(26,95,122,0.25) !important; }
+.adv-block-care .adv-block-label { color:var(--teal); }
+
+.adv-logo-preview { display:none; align-items:center; gap:8px; padding:7px 9px; background:var(--teal-pale); border-radius:7px; margin-top:7px; border:1px solid var(--border); }
+.adv-logo-preview img { width:32px; height:32px; object-fit:contain; background:#fff; border-radius:4px; padding:2px; }
+.adv-logo-preview-name { font-size:10px; font-weight:600; color:var(--teal-dark); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:120px; flex:1; }
+.adv-remove-logo { background:none; border:none; color:#e05252; cursor:pointer; font-size:14px; padding:2px 4px; border-radius:4px; }
+
+#confirm-overlay { display:none; position:fixed; inset:0; background:rgba(10,30,40,0.8); z-index:2000; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
+#confirm-overlay.open { display:flex; }
+.confirm-box { background:#fff; border-radius:16px; padding:28px 28px 22px; max-width:380px; width:90%; box-shadow:0 24px 60px rgba(0,0,0,0.25); animation:modalIn 0.22s cubic-bezier(0.22,1,0.36,1); }
+.confirm-icon { font-size:36px; text-align:center; margin-bottom:12px; }
+.confirm-title { font-family:'DM Serif Display',serif; font-size:20px; color:var(--teal-dark); text-align:center; margin-bottom:8px; }
+.confirm-msg { font-size:13px; color:var(--muted); text-align:center; line-height:1.55; margin-bottom:20px; }
+.confirm-btns { display:flex; gap:8px; }
+.confirm-btns .btn { flex:1; }
+
+#quote-overlay { display:none; position:fixed; inset:0; background:rgba(10,30,40,0.7); z-index:3000; align-items:center; justify-content:center; backdrop-filter:blur(4px); padding:16px; overflow-y:auto; }
+#quote-overlay.open { display:flex; }
+.quote-box { background:#fff; border-radius:18px; padding:26px; max-width:580px; width:100%; box-shadow:0 24px 64px rgba(0,0,0,0.22); animation:modalIn 0.22s cubic-bezier(0.22,1,0.36,1); max-height:calc(100vh - 40px); overflow-y:auto; }
+.quote-head { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+.quote-head-icon { width:42px; height:42px; background:linear-gradient(135deg,var(--teal),var(--teal-dark)); border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+.quote-head-title { font-family:'DM Serif Display',serif; font-size:20px; color:var(--teal-dark); }
+.quote-head-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+.quote-summary { background:var(--teal-pale); border:1px solid var(--border); border-radius:9px; padding:12px; margin-bottom:16px; font-size:11px; color:var(--teal-dark); line-height:1.8; font-weight:500; }
+.quote-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:9px; }
+.quote-form-full { margin-bottom:14px; }
+.q-input { width:100%; border:2px solid var(--border); border-radius:8px; padding:9px 12px; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--text); background:var(--surface2); outline:none; transition:border 0.18s; }
+.q-input:focus { border-color:var(--teal); background:#fff; }
+
+/* Wash care SVG icons - using teal stroke in controls */
+.care-icon svg { stroke: var(--teal); }
+.care-btn.active .care-icon svg { stroke: var(--teal-dark); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">
+    <svg class="sun-icon" viewBox="0 0 38 38" fill="none">
+      <circle cx="19" cy="20" r="9" fill="#f5a623"/>
+      <line x1="19" y1="2" x2="19" y2="7" stroke="#f5a623" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="19" y1="33" x2="19" y2="38" stroke="#f5a623" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="2" y1="20" x2="7" y2="20" stroke="#f5a623" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="31" y1="20" x2="36" y2="20" stroke="#f5a623" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="5.7" y1="5.7" x2="9.2" y2="9.2" stroke="#f5a623" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="28.8" y1="30.8" x2="32.3" y2="34.3" stroke="#f5a623" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="32.3" y1="5.7" x2="28.8" y2="9.2" stroke="#f5a623" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="9.2" y1="30.8" x2="5.7" y2="34.3" stroke="#f5a623" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <div class="logo-text"><span>Sol</span>Trim</div>
+      <span class="logo-sub">International</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="live-dot"></span> Live Preview
+    <span class="badge">Label Designer</span>
+  </div>
+</div>
+
+<div class="designer-wrap">
+  <div class="page-title-bar">
+    <div>
+      <h1>Label Mockup <em>Designer</em></h1>
+      <p>Customise your label, preview it instantly, and request a quote — all in one place.</p>
+    </div>
+  </div>
+
+  <div class="designer-grid">
+    <!-- LEFT CONTROLS -->
+    <div>
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-header-icon">🎛️</div>
+          <h3>Customisation Controls</h3>
+        </div>
+
+        <div class="ctrl-tabs" style="padding-top:14px;">
+          <button class="ctrl-tab active" onclick="switchTab('label')">Label</button>
+          <button class="ctrl-tab" onclick="switchTab('brand')">Brand</button>
+          <button class="ctrl-tab" onclick="switchTab('care')">Care</button>
+          <button class="ctrl-tab" onclick="switchTab('finish')">Finish</button>
+        </div>
+
+        <div class="panel-body">
+
+          <!-- TAB: LABEL -->
+          <div class="ctrl-tab-content active" id="tab-label">
+            <div class="ctrl-section">
+              <div class="ctrl-label">Label Type</div>
+              <div class="type-grid" id="sb-type-grid">
+                <div class="type-pill active" onclick="setType(this,'neck')" data-tip="Sewn at neckline">
+                  <div class="type-pill-icon">🏷️</div><div class="type-pill-name">Neck Label</div><div class="type-pill-desc">Main ID label</div>
+                </div>
+                <div class="type-pill" onclick="setType(this,'woven')" data-tip="Woven fabric label">
+                  <div class="type-pill-icon">🧵</div><div class="type-pill-name">Woven</div><div class="type-pill-desc">Premium fabric</div>
+                </div>
+                <div class="type-pill" onclick="setType(this,'hangtag')" data-tip="Hangs off garment">
+                  <div class="type-pill-icon">🔖</div><div class="type-pill-name">Hang Tag</div><div class="type-pill-desc">Cardboard / PVC</div>
+                </div>
+                <div class="type-pill" onclick="setType(this,'heat')" data-tip="Heat pressed on fabric">
+                  <div class="type-pill-icon">🔥</div><div class="type-pill-name">Heat Transfer</div><div class="type-pill-desc">No sewing needed</div>
+                </div>
+                <div class="type-pill" onclick="setType(this,'sticker')" data-tip="Adhesive sticker label">
+                  <div class="type-pill-icon">⭐</div><div class="type-pill-name">Sticker</div><div class="type-pill-desc">Self-adhesive</div>
+                </div>
+                <div class="type-pill" onclick="setType(this,'tpu')" data-tip="TPU rubber label">
+                  <div class="type-pill-icon">🔲</div><div class="type-pill-name">TPU Label</div><div class="type-pill-desc">Rubber / 3D</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="ctrl-section">
+              <div class="ctrl-label">Size Preset</div>
+              <div class="size-grid" id="sb-size-row">
+                <button class="size-btn active" onclick="setSize(this,3,6)">3×6 cm</button>
+                <button class="size-btn" onclick="setSize(this,6,3)">6×3 cm</button>
+                <button class="size-btn" onclick="setSize(this,5,5)">5×5 cm</button>
+                <button class="size-btn" onclick="setSize(this,4,8)">4×8 cm</button>
+                <button class="size-btn" onclick="setSize(this,2,5)">2×5 cm</button>
+                <button class="size-btn" onclick="setSize(this,7,3)">7×3 cm</button>
+              </div>
+            </div>
+
+            <div class="ctrl-section" style="margin-top:14px;">
+              <div class="ctrl-label">Orientation</div>
+              <div class="orientation-btns">
+                <button class="orient-btn active" id="sb-orient-p" onclick="setOrientation('portrait')">⬜ Portrait</button>
+                <button class="orient-btn" id="sb-orient-l" onclick="setOrientation('landscape')">▭ Landscape</button>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="ctrl-section">
+              <div class="ctrl-label">Label Background</div>
+              <div class="color-row" id="bg-colors">
+                <div class="color-swatch active" style="background:#ffffff;" onclick="setBgColor(this,'#ffffff')" data-tip="White"></div>
+                <div class="color-swatch" style="background:#f5f0e8;" onclick="setBgColor(this,'#f5f0e8')" data-tip="Cream"></div>
+                <div class="color-swatch" style="background:#1a2e3b;" onclick="setBgColor(this,'#1a2e3b')" data-tip="Navy"></div>
+                <div class="color-swatch" style="background:#2c2c2c;" onclick="setBgColor(this,'#2c2c2c')" data-tip="Black"></div>
+                <div class="color-swatch" style="background:#1a5f7a;" onclick="setBgColor(this,'#1a5f7a')" data-tip="Teal"></div>
+                <div class="color-swatch" style="background:#8b6346;" onclick="setBgColor(this,'#8b6346')" data-tip="Brown"></div>
+                <div class="color-swatch" style="background:#e8e0d8;" onclick="setBgColor(this,'#e8e0d8')" data-tip="Linen"></div>
+                <div class="color-swatch custom" data-tip="Custom">
+                  <input type="color" id="custom-bg-color" oninput="setCustomBgColor(this.value)"/>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB: BRAND -->
+          <div class="ctrl-tab-content" id="tab-brand">
+            <div class="ctrl-section">
+              <div class="ctrl-label">Upload Logo</div>
+              <div class="upload-zone" id="upload-zone">
+                <input type="file" id="logo-input" accept="image/png,image/jpeg,image/svg+xml,image/webp" onchange="handleLogoUpload(this)"/>
+                <div class="upload-icon">⬆️</div>
+                <div class="upload-hint"><strong>Click or drag</strong> your logo here</div>
+                <div class="upload-hint" style="margin-top:4px;">PNG, JPG, SVG, WEBP (max 5MB)</div>
+              </div>
+              <div class="upload-preview" id="logo-preview">
+                <img id="logo-preview-img" src="" alt=""/>
+                <span class="upload-preview-name" id="logo-preview-name"></span>
+                <button class="remove-logo" onclick="removeLogo()">✕</button>
+              </div>
+            </div>
+
+            <div class="ctrl-section">
+              <div class="ctrl-label">Logo Size</div>
+              <div class="slider-row">
+                <input type="range" class="ctrl-range" id="logo-size" min="20" max="90" value="55" oninput="setLogoSize(this.value)"/>
+                <span class="range-val" id="logo-size-val">55%</span>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="ctrl-section">
+              <div class="ctrl-label">Brand Name</div>
+              <input type="text" class="ctrl-input" id="brand-name" placeholder="e.g. YOUR BRAND" maxlength="30" oninput="renderLabel()"/>
+            </div>
+
+            <div class="ctrl-section">
+              <div class="ctrl-label">Tagline / Subtitle</div>
+              <input type="text" class="ctrl-input" id="tagline" placeholder="e.g. Premium Quality" maxlength="40" oninput="renderLabel()"/>
+            </div>
+
+            <!-- NEW: Description rich text -->
+            <div class="ctrl-section">
+              <div class="ctrl-label">Description</div>
+              <div class="rt-toolbar">
+                <button class="rt-btn" id="sb-rt-bold" onclick="sbRtToggle('bold')" title="Bold"><b>B</b></button>
+                <button class="rt-btn" id="sb-rt-italic" onclick="sbRtToggle('italic')" title="Italic"><i>I</i></button>
+                <button class="rt-btn" id="sb-rt-upper" onclick="sbRtToggle('upper')" title="UPPERCASE">AA</button>
+                <button class="rt-btn" id="sb-rt-center" onclick="sbRtToggle('center')" title="Center" style="font-size:10px;">⬛</button>
+              </div>
+              <textarea class="ctrl-textarea" id="description" placeholder="e.g. Handcrafted with care&#10;Premium woven fabric&#10;Sustainably sourced" oninput="renderLabel()"></textarea>
+            </div>
+
+            <div class="ctrl-section">
+              <div class="ctrl-label">Text Color</div>
+              <div class="color-row" id="text-colors">
+                <div class="color-swatch active" style="background:#1a2e3b;" onclick="setTextColor(this,'#1a2e3b')" data-tip="Dark"></div>
+                <div class="color-swatch" style="background:#ffffff;border:1px solid #dce6ed;" onclick="setTextColor(this,'#ffffff')" data-tip="White"></div>
+                <div class="color-swatch" style="background:#1a5f7a;" onclick="setTextColor(this,'#1a5f7a')" data-tip="Teal"></div>
+                <div class="color-swatch" style="background:#f5a623;" onclick="setTextColor(this,'#f5a623')" data-tip="Gold"></div>
+                <div class="color-swatch" style="background:#8b6346;" onclick="setTextColor(this,'#8b6346')" data-tip="Brown"></div>
+                <div class="color-swatch custom" data-tip="Custom">
+                  <input type="color" id="custom-text-color" oninput="setCustomTextColor(this.value)"/>
+                </div>
+              </div>
+            </div>
+
+            <div class="ctrl-section">
+              <div class="ctrl-label">Font Style</div>
+              <div class="font-grid">
+                <div class="font-btn active" style="font-family:sans-serif;font-weight:700;" onclick="setFont(this,'Arial, sans-serif')">Sans</div>
+                <div class="font-btn" style="font-family:serif;" onclick="setFont(this,'Georgia, serif')">Serif</div>
+                <div class="font-btn" style="font-family:'Courier New',monospace;" onclick="setFont(this,'Courier New, monospace')">Mono</div>
+                <div class="font-btn" style="font-style:italic;font-family:Georgia,serif;" onclick="setFont(this,'Georgia, serif italic')">Italic</div>
+              </div>
+            </div>
+
+            <div class="ctrl-section">
+              <div class="ctrl-label">Brand Name Size</div>
+              <div class="slider-row">
+                <input type="range" class="ctrl-range" id="brand-size" min="8" max="28" value="16" oninput="renderLabel()"/>
+                <span class="range-val" id="brand-size-val">16px</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB: CARE -->
+          <div class="ctrl-tab-content" id="tab-care">
+            <div class="ctrl-section">
+              <div class="ctrl-label">Wash Care Symbols</div>
+              <div class="care-grid" id="sb-care-grid"></div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="ctrl-section">
+              <div class="ctrl-label">Composition / Content</div>
+              <input type="text" class="ctrl-input" id="composition" placeholder="e.g. 100% Cotton" maxlength="50" oninput="renderLabel()"/>
+            </div>
+
+            <div class="ctrl-section">
+              <div class="ctrl-label">Country of Origin</div>
+              <input type="text" class="ctrl-input" id="origin" placeholder="e.g. Made in Sri Lanka" maxlength="30" oninput="renderLabel()"/>
+            </div>
+
+            <div class="ctrl-section">
+              <div class="ctrl-label">Size Mark</div>
+              <div class="size-grid" id="sizelabel-grid">
+                <button class="size-btn" onclick="setSizeLabel(this,'XS')">XS</button>
+                <button class="size-btn" onclick="setSizeLabel(this,'S')">S</button>
+                <button class="size-btn" onclick="setSizeLabel(this,'M')">M</button>
+                <button class="size-btn" onclick="setSizeLabel(this,'L')">L</button>
+                <button class="size-btn" onclick="setSizeLabel(this,'XL')">XL</button>
+                <button class="size-btn" onclick="setSizeLabel(this,'XXL')">XXL</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB: FINISH -->
+          <div class="ctrl-tab-content" id="tab-finish">
+            <div class="ctrl-section">
+              <div class="ctrl-label">Material / Finish</div>
+              <div class="material-grid" id="sb-mat-grid">
+                <button class="material-btn active" onclick="setMaterial(this,'satin')"><div class="material-icon">✨</div>Satin</button>
+                <button class="material-btn" onclick="setMaterial(this,'matte')"><div class="material-icon">🔲</div>Matte</button>
+                <button class="material-btn" onclick="setMaterial(this,'cotton')"><div class="material-icon">🌿</div>Cotton</button>
+                <button class="material-btn" onclick="setMaterial(this,'kraft')"><div class="material-icon">📦</div>Kraft</button>
+                <button class="material-btn" onclick="setMaterial(this,'transparent')"><div class="material-icon">💎</div>Clear</button>
+                <button class="material-btn" onclick="setMaterial(this,'recycled')"><div class="material-icon">♻️</div>Recycled</button>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="ctrl-section">
+              <div class="ctrl-label">Special Effects</div>
+              <div class="toggle-row">
+                <span class="toggle-label">Carbon Neutral Mark</span>
+                <div class="toggle on" id="toggle-carbon" onclick="toggleFeature('carbon')"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PREVIEW -->
+    <div class="preview-panel">
+      <div class="preview-card">
+        <div class="view-tabs">
+          <div class="view-tab active" onclick="setViewTab(this,'canvas')">Preview</div>
+          <div class="view-tab" onclick="setViewTab(this,'placement')">Placements</div>
+          <div class="view-tab" onclick="setViewTab(this,'specs')">Specs</div>
+        </div>
+
+        <!-- Canvas view -->
+        <div id="view-canvas">
+          <div class="preview-stage" id="preview-stage">
+            <div class="preview-garment"></div>
+            <svg viewBox="0 0 280 160" fill="none" style="position:absolute;top:30px;left:50%;transform:translateX(-50%);width:280px;height:160px;">
+              <path d="M80 0 Q140 30 200 0 L240 60 L200 70 L200 160 L80 160 L80 70 L40 60 Z" fill="rgba(26,95,122,0.07)" stroke="rgba(26,95,122,0.15)" stroke-width="1.5"/>
+              <path d="M100 0 Q140 20 180 0" fill="none" stroke="rgba(26,95,122,0.2)" stroke-width="1.5"/>
+            </svg>
+            <div class="label-canvas-wrap" style="margin-top:40px;position:relative;z-index:5;">
+              <canvas id="label-canvas" width="200" height="300"></canvas>
+              <div class="label-shadow"></div>
+            </div>
+          </div>
+
+          <div class="preview-info-bar">
+            <div class="info-chip"><div class="info-chip-dot"></div><span id="chip-type">Neck Label</span></div>
+            <div class="info-chip"><div class="info-chip-dot"></div><span id="chip-size">3×6 cm</span></div>
+            <div class="info-chip"><div class="info-chip-dot"></div><span id="chip-material">Satin</span></div>
+            <div class="info-chip"><div class="info-chip-dot"></div><span id="chip-finish">Standard</span></div>
+          </div>
+        </div>
+
+        <!-- Placement view -->
+        <div id="view-placement" style="display:none;">
+          <div class="placement-views">
+            <div class="placement-view active" onclick="setPlacement(this,'neck')">
+              <div class="placement-view-img"><svg viewBox="0 0 80 80" width="60"><path d="M20 0 Q40 15 60 0 L70 30 L55 35 L55 80 L25 80 L25 35 L10 30Z" fill="rgba(26,95,122,0.12)" stroke="rgba(26,95,122,0.3)" stroke-width="1.5"/><rect x="30" y="7" width="20" height="14" rx="2" fill="white" stroke="rgba(26,95,122,0.4)" stroke-width="1.5"/></svg></div>
+              <div class="placement-name">Neck Inside</div>
+            </div>
+            <div class="placement-view" onclick="setPlacement(this,'side')">
+              <div class="placement-view-img"><svg viewBox="0 0 80 80" width="60"><path d="M20 0 Q40 15 60 0 L70 30 L55 35 L55 80 L25 80 L25 35 L10 30Z" fill="rgba(26,95,122,0.12)" stroke="rgba(26,95,122,0.3)" stroke-width="1.5"/><rect x="48" y="45" width="14" height="10" rx="1.5" fill="white" stroke="rgba(26,95,122,0.4)" stroke-width="1.5"/></svg></div>
+              <div class="placement-name">Side Seam</div>
+            </div>
+            <div class="placement-view" onclick="setPlacement(this,'hem')">
+              <div class="placement-view-img"><svg viewBox="0 0 80 80" width="60"><path d="M20 0 Q40 15 60 0 L70 30 L55 35 L55 80 L25 80 L25 35 L10 30Z" fill="rgba(26,95,122,0.12)" stroke="rgba(26,95,122,0.3)" stroke-width="1.5"/><rect x="33" y="68" width="14" height="8" rx="1" fill="white" stroke="rgba(26,95,122,0.4)" stroke-width="1.5"/></svg></div>
+              <div class="placement-name">Hem</div>
+            </div>
+            <div class="placement-view" onclick="setPlacement(this,'sleeve')">
+              <div class="placement-view-img"><svg viewBox="0 0 80 80" width="60"><path d="M20 0 Q40 15 60 0 L70 30 L55 35 L55 80 L25 80 L25 35 L10 30Z" fill="rgba(26,95,122,0.12)" stroke="rgba(26,95,122,0.3)" stroke-width="1.5"/><rect x="10" y="23" width="14" height="9" rx="1" fill="white" stroke="rgba(26,95,122,0.4)" stroke-width="1.5"/></svg></div>
+              <div class="placement-name">Sleeve</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Specs view -->
+        <div id="view-specs" style="display:none;">
+          <div class="specs-grid">
+            <div><div class="spec-label">Label Type</div><div class="spec-value" id="spec-type">Neck Label</div></div>
+            <div><div class="spec-label">Dimensions</div><div class="spec-value" id="spec-dims">3 × 6 cm</div></div>
+            <div><div class="spec-label">Material</div><div class="spec-value" id="spec-mat">Satin Polyester</div></div>
+            <div><div class="spec-label">Finish</div><div class="spec-value" id="spec-finish-val">Standard</div></div>
+            <div><div class="spec-label">Orientation</div><div class="spec-value" id="spec-orientation">Portrait</div></div>
+            <div><div class="spec-label">Placement</div><div class="spec-value" id="spec-placement">Neck Inside</div></div>
+            <div><div class="spec-label">Background</div><div class="spec-value" id="spec-bgcolor">#FFFFFF</div></div>
+            <div><div class="spec-label">Text Color</div><div class="spec-value" id="spec-textcolor">#1a2e3b</div></div>
+            <div><div class="spec-label">Font Style</div><div class="spec-value" id="spec-fontstyle">Sans</div></div>
+            <div><div class="spec-label">Brand Name Size</div><div class="spec-value" id="spec-brandsize">16px</div></div>
+            <div><div class="spec-label">Logo Size</div><div class="spec-value" id="spec-logosize">55%</div></div>
+            <div><div class="spec-label">Print Method</div><div class="spec-value" id="spec-print">Digital Print</div></div>
+            <div><div class="spec-label">Min. Order</div><div class="spec-value">500 pcs</div></div>
+            <div><div class="spec-label">Turnaround</div><div class="spec-value">7–10 days</div></div>
+            <div><div class="spec-label">Carbon Neutral</div><div class="spec-value" id="spec-carbon">✅ Yes</div></div>
+            <div><div class="spec-label">Brand Name</div><div class="spec-value" id="spec-brand">—</div></div>
+            <div><div class="spec-label">Tagline</div><div class="spec-value" id="spec-tagline">—</div></div>
+            <div><div class="spec-label">Composition</div><div class="spec-value" id="spec-composition">—</div></div>
+            <div><div class="spec-label">Origin</div><div class="spec-value" id="spec-origin">—</div></div>
+            <div><div class="spec-label">Size Mark</div><div class="spec-value" id="spec-sizelabel">—</div></div>
+            <div><div class="spec-label">Care Symbols</div><div class="spec-value" id="spec-care">—</div></div>
+          </div>
+        </div>
+
+        <div class="action-bar">
+          <button class="btn btn-secondary" onclick="resetDesign()">↺ Reset</button>
+          <button class="btn btn-primary" onclick="downloadPNG()">⬇ Download PNG</button>
+          <button class="btn btn-gold" onclick="openQuote()">📩 Get a Quote</button>
+          <button class="btn btn-pro" onclick="openAdvanced()" style="margin-left:auto;">✦ Open Pro Builder</button>
+        </div>
+      </div>
+
+      <div class="summary-bar">
+        <div class="summary-icon">🌿</div>
+        <div><p><strong>Asia's First CarbonNeutral® Label Manufacturer.</strong> Every label produced by SolTrim International contributes to a verified carbon offset program. Your branding, responsibly made.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- PRO BUILDER MODAL -->
+<div id="adv-modal-overlay">
+  <div id="adv-modal">
+    <div class="adv-modal-head">
+      <svg width="28" height="28" viewBox="0 0 38 38" fill="none">
+        <circle cx="19" cy="20" r="9" fill="#f5a623"/>
+        <line x1="19" y1="2" x2="19" y2="7" stroke="#f5a623" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="19" y1="33" x2="19" y2="38" stroke="#f5a623" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="2" y1="20" x2="7" y2="20" stroke="#f5a623" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="31" y1="20" x2="36" y2="20" stroke="#f5a623" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <div class="adv-modal-title"><span>Sol</span>Trim Pro Builder</div>
+      <div class="adv-modal-badge">✦ Pro Mode</div>
+      <button class="adv-modal-close" onclick="tryCloseAdvanced()">✕</button>
+    </div>
+
+    <div class="adv-modal-body">
+      <div class="adv-left">
+        <div class="adv-tabs">
+          <button class="adv-tab active" onclick="advTab(this,'label')">Label</button>
+          <button class="adv-tab" onclick="advTab(this,'brand')">Brand</button>
+          <button class="adv-tab" onclick="advTab(this,'care')">Care</button>
+          <button class="adv-tab" onclick="advTab(this,'finish')">Finish</button>
+        </div>
+
+        <!-- ADV TAB: LABEL -->
+        <div class="adv-tab-content active" id="adv-tab-label">
+          <div class="adv-section">
+            <div class="adv-label">Label Type</div>
+            <div class="adv-type-grid" id="adv-type-grid">
+              <div class="adv-pill active" onclick="advSetType(this,'neck')"><div class="adv-pill-icon">🏷️</div><div class="adv-pill-name">Neck</div></div>
+              <div class="adv-pill" onclick="advSetType(this,'woven')"><div class="adv-pill-icon">🧵</div><div class="adv-pill-name">Woven</div></div>
+              <div class="adv-pill" onclick="advSetType(this,'hangtag')"><div class="adv-pill-icon">🔖</div><div class="adv-pill-name">Hang Tag</div></div>
+              <div class="adv-pill" onclick="advSetType(this,'heat')"><div class="adv-pill-icon">🔥</div><div class="adv-pill-name">Heat</div></div>
+              <div class="adv-pill" onclick="advSetType(this,'sticker')"><div class="adv-pill-icon">⭐</div><div class="adv-pill-name">Sticker</div></div>
+              <div class="adv-pill" onclick="advSetType(this,'tpu')"><div class="adv-pill-icon">🔲</div><div class="adv-pill-name">TPU</div></div>
+            </div>
+          </div>
+          <div class="adv-divider"></div>
+          <div class="adv-section">
+            <div class="adv-label">Size Preset</div>
+            <div class="adv-size-row" id="adv-size-row">
+              <button class="adv-size-btn active" onclick="advSetSize(this,3,6)">3×6</button>
+              <button class="adv-size-btn" onclick="advSetSize(this,6,3)">6×3</button>
+              <button class="adv-size-btn" onclick="advSetSize(this,5,5)">5×5</button>
+              <button class="adv-size-btn" onclick="advSetSize(this,4,8)">4×8</button>
+              <button class="adv-size-btn" onclick="advSetSize(this,2,5)">2×5</button>
+              <button class="adv-size-btn" onclick="advSetSize(this,7,3)">7×3</button>
+            </div>
+            <div class="adv-orient-row">
+              <button class="adv-orient-btn active" id="adv-op" onclick="advSetOrient('portrait')">⬜ Portrait</button>
+              <button class="adv-orient-btn" id="adv-ol" onclick="advSetOrient('landscape')">▭ Landscape</button>
+            </div>
+          </div>
+          <div class="adv-divider"></div>
+          <div class="adv-section">
+            <div class="adv-label">Background Color</div>
+            <div class="adv-color-row" id="adv-bg-colors">
+              <div class="adv-swatch active" style="background:#ffffff;" onclick="advSetBg(this,'#ffffff')"></div>
+              <div class="adv-swatch" style="background:#f5f0e8;" onclick="advSetBg(this,'#f5f0e8')"></div>
+              <div class="adv-swatch" style="background:#1a2e3b;" onclick="advSetBg(this,'#1a2e3b')"></div>
+              <div class="adv-swatch" style="background:#2c2c2c;" onclick="advSetBg(this,'#2c2c2c')"></div>
+              <div class="adv-swatch" style="background:#1a5f7a;" onclick="advSetBg(this,'#1a5f7a')"></div>
+              <div class="adv-swatch" style="background:#8b6346;" onclick="advSetBg(this,'#8b6346')"></div>
+              <div class="adv-swatch" style="background:#e8e0d8;" onclick="advSetBg(this,'#e8e0d8')"></div>
+              <div class="adv-swatch custom-swatch"><input type="color" id="adv-custom-bg" oninput="advSetBgCustom(this.value)"/></div>
+            </div>
+          </div>
+          <div class="adv-section" style="margin-top:14px;">
+            <div class="adv-label">Border Style</div>
+            <div class="adv-border-grid">
+              <button class="adv-border-btn active" onclick="advSetBorder(this,'none')">None</button>
+              <button class="adv-border-btn" onclick="advSetBorder(this,'thin')">Thin</button>
+              <button class="adv-border-btn" onclick="advSetBorder(this,'thick')">Thick</button>
+              <button class="adv-border-btn" onclick="advSetBorder(this,'dashed')">Dashed</button>
+              <button class="adv-border-btn" onclick="advSetBorder(this,'double')">Double</button>
+              <button class="adv-border-btn" onclick="advSetBorder(this,'stitched')">Stitched</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ADV TAB: BRAND -->
+        <div class="adv-tab-content" id="adv-tab-brand">
+          <div class="adv-section">
+            <div class="adv-label">Upload Logo</div>
+            <div class="upload-zone" style="padding:12px;" id="adv-upload-zone">
+              <input type="file" id="adv-logo-input" accept="image/png,image/jpeg,image/svg+xml,image/webp" onchange="advHandleLogo(this)"/>
+              <div style="font-size:20px;margin-bottom:4px;">⬆️</div>
+              <div class="upload-hint"><strong>Click or drag</strong> · PNG, JPG, SVG · 5MB max</div>
+            </div>
+            <div class="adv-logo-preview" id="adv-logo-preview">
+              <img id="adv-logo-preview-img" src="" alt=""/>
+              <span class="adv-logo-preview-name" id="adv-logo-preview-name"></span>
+              <button class="adv-remove-logo" onclick="advRemoveLogo()">✕</button>
+            </div>
+          </div>
+          <div class="adv-section">
+            <div class="adv-label">Logo Size</div>
+            <div class="adv-slider-row">
+              <input type="range" class="adv-range" id="adv-logo-size" min="10" max="90" value="55" oninput="advRender()"/>
+              <span class="adv-range-val" id="adv-logo-size-val">55%</span>
+            </div>
+          </div>
+          <div class="adv-section">
+            <div class="adv-label">Logo Position</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div>
+                <div style="font-size:9px;color:var(--muted);font-weight:600;margin-bottom:4px;">X Offset</div>
+                <div class="adv-slider-row">
+                  <input type="range" class="adv-range" id="adv-logo-x" min="-50" max="50" value="0" oninput="advRender()"/>
+                  <span class="adv-range-val" id="adv-logo-x-val">0</span>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:9px;color:var(--muted);font-weight:600;margin-bottom:4px;">Y Offset</div>
+                <div class="adv-slider-row">
+                  <input type="range" class="adv-range" id="adv-logo-y" min="-50" max="50" value="0" oninput="advRender()"/>
+                  <span class="adv-range-val" id="adv-logo-y-val">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="adv-divider"></div>
+          <div class="adv-section">
+            <div class="adv-label">Brand Name</div>
+            <div class="adv-rt-toolbar">
+              <button class="adv-rt-btn" id="rt-bn-bold" onclick="rtToggle('brand','bold')"><b>B</b></button>
+              <button class="adv-rt-btn" id="rt-bn-italic" onclick="rtToggle('brand','italic')"><i>I</i></button>
+              <button class="adv-rt-btn" id="rt-bn-underline" onclick="rtToggle('brand','underline')"><u>U</u></button>
+              <button class="adv-rt-btn" id="rt-bn-upper" onclick="rtToggle('brand','upper')">AA</button>
+            </div>
+            <textarea class="adv-rt-area" id="adv-brand-text" placeholder="Your Brand Name" rows="2" oninput="advRender()"></textarea>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:7px;">
+              <div>
+                <div style="font-size:9px;color:var(--muted);font-weight:600;margin-bottom:3px;">Font Size</div>
+                <div class="adv-slider-row">
+                  <input type="range" class="adv-range" id="adv-bn-size" min="8" max="32" value="16" oninput="advRender()"/>
+                  <span class="adv-range-val" id="adv-bn-size-val">16</span>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:9px;color:var(--muted);font-weight:600;margin-bottom:3px;">Letter Spacing</div>
+                <div class="adv-slider-row">
+                  <input type="range" class="adv-range" id="adv-bn-ls" min="0" max="10" value="0" step="0.5" oninput="advRender()"/>
+                  <span class="adv-range-val" id="adv-bn-ls-val">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="adv-section">
+            <div class="adv-label">Tagline / Subtitle</div>
+            <div class="adv-rt-toolbar">
+              <button class="adv-rt-btn" id="rt-tg-bold" onclick="rtToggle('tagline','bold')"><b>B</b></button>
+              <button class="adv-rt-btn" id="rt-tg-italic" onclick="rtToggle('tagline','italic')"><i>I</i></button>
+              <button class="adv-rt-btn" id="rt-tg-underline" onclick="rtToggle('tagline','underline')"><u>U</u></button>
+              <button class="adv-rt-btn" id="rt-tg-upper" onclick="rtToggle('tagline','upper')">AA</button>
+            </div>
+            <textarea class="adv-rt-area" id="adv-tagline-text" placeholder="e.g. Premium Quality" rows="2" oninput="advRender()"></textarea>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:7px;">
+              <div>
+                <div style="font-size:9px;color:var(--muted);font-weight:600;margin-bottom:3px;">Font Size</div>
+                <div class="adv-slider-row">
+                  <input type="range" class="adv-range" id="adv-tg-size" min="6" max="22" value="10" oninput="advRender()"/>
+                  <span class="adv-range-val" id="adv-tg-size-val">10</span>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:9px;color:var(--muted);font-weight:600;margin-bottom:3px;">Line Height</div>
+                <div class="adv-slider-row">
+                  <input type="range" class="adv-range" id="adv-tg-lh" min="1" max="3" value="1.4" step="0.1" oninput="advRender()"/>
+                  <span class="adv-range-val" id="adv-tg-lh-val">1.4</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="adv-section">
+            <div class="adv-label">Text Color</div>
+            <div class="adv-color-row" id="adv-text-colors">
+              <div class="adv-swatch active" style="background:#1a2e3b;" onclick="advSetTextColor(this,'#1a2e3b')"></div>
+              <div class="adv-swatch" style="background:#ffffff;border:2px solid #dce6ed;" onclick="advSetTextColor(this,'#ffffff')"></div>
+              <div class="adv-swatch" style="background:#1a5f7a;" onclick="advSetTextColor(this,'#1a5f7a')"></div>
+              <div class="adv-swatch" style="background:#f5a623;" onclick="advSetTextColor(this,'#f5a623')"></div>
+              <div class="adv-swatch" style="background:#8b6346;" onclick="advSetTextColor(this,'#8b6346')"></div>
+              <div class="adv-swatch custom-swatch"><input type="color" id="adv-custom-text" oninput="advSetTextColorCustom(this.value)"/></div>
+            </div>
+          </div>
+          <div class="adv-section">
+            <div class="adv-label">Font Family</div>
+            <div class="adv-font-row">
+              <div class="adv-font-btn active" style="font-weight:700;" onclick="advSetFont(this,'Arial, sans-serif')">Sans</div>
+              <div class="adv-font-btn" style="font-family:Georgia,serif;" onclick="advSetFont(this,'Georgia, serif')">Serif</div>
+              <div class="adv-font-btn" style="font-family:'Courier New',monospace;" onclick="advSetFont(this,'Courier New, monospace')">Mono</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ADV TAB: CARE -->
+        <div class="adv-tab-content" id="adv-tab-care">
+          <div class="adv-section">
+            <div class="adv-label">Wash Care Symbols</div>
+            <div class="adv-care-grid" id="adv-care-grid"></div>
+            <div style="font-size:9px;color:var(--muted);margin-top:6px;">Click to add • Drag below list to reorder</div>
+            <div class="adv-care-active-list" id="adv-care-active-list"></div>
+          </div>
+          <div class="adv-divider"></div>
+          <div class="adv-section">
+            <div class="adv-label">Content Blocks — drag to reorder</div>
+            <div class="adv-block-list" id="adv-block-list"></div>
+          </div>
+        </div>
+
+        <!-- ADV TAB: FINISH -->
+        <div class="adv-tab-content" id="adv-tab-finish">
+          <div class="adv-section">
+            <div class="adv-label">Material Finish</div>
+            <div class="adv-mat-grid" id="adv-mat-grid">
+              <button class="adv-mat-btn active" onclick="advSetMat(this,'satin')"><div class="adv-mat-icon">✨</div>Satin</button>
+              <button class="adv-mat-btn" onclick="advSetMat(this,'matte')"><div class="adv-mat-icon">🔲</div>Matte</button>
+              <button class="adv-mat-btn" onclick="advSetMat(this,'cotton')"><div class="adv-mat-icon">🌿</div>Cotton</button>
+              <button class="adv-mat-btn" onclick="advSetMat(this,'kraft')"><div class="adv-mat-icon">📦</div>Kraft</button>
+              <button class="adv-mat-btn" onclick="advSetMat(this,'clear')"><div class="adv-mat-icon">💎</div>Clear</button>
+              <button class="adv-mat-btn" onclick="advSetMat(this,'recycled')"><div class="adv-mat-icon">♻️</div>Recycled</button>
+            </div>
+          </div>
+          <div class="adv-divider"></div>
+          <div class="adv-section">
+            <div class="adv-label">Special Effects</div>
+            <div class="adv-toggle-row">
+              <span class="adv-toggle-label">CarbonNeutral® Badge</span>
+              <div class="adv-toggle on" id="adv-t-carbon" onclick="advToggleEffect('carbon')"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADV RIGHT: Preview -->
+      <div class="adv-right">
+        <div class="adv-view-tabs">
+          <div class="adv-view-tab active" onclick="advSetViewTab(this,'canvas')">Preview</div>
+          <div class="adv-view-tab" onclick="advSetViewTab(this,'placement')">Placements</div>
+          <div class="adv-view-tab" onclick="advSetViewTab(this,'specs')">Specs</div>
+        </div>
+
+        <!-- Canvas view -->
+        <div id="adv-view-canvas" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+        <div class="adv-preview-stage">
+          <svg class="adv-garment-svg" viewBox="0 0 320 270" fill="none">
+            <path d="M80 0 Q160 48 240 0 L296 86 L240 104 L240 270 L80 270 L80 104 L24 86 Z" fill="rgba(26,95,122,1)" stroke="rgba(26,95,122,0.4)" stroke-width="2"/>
+            <path d="M108 0 Q160 26 212 0" fill="none" stroke="rgba(26,95,122,0.5)" stroke-width="2"/>
+          </svg>
+          <div class="adv-canvas-wrap">
+            <canvas id="adv-canvas" width="150" height="225"></canvas>
+            <div class="adv-canvas-shadow"></div>
+          </div>
+        </div>
+        <div class="adv-preview-info">
+          <div class="adv-chip"><div class="adv-chip-dot"></div><span id="adv-chip-type">Neck Label</span></div>
+          <div class="adv-chip"><div class="adv-chip-dot"></div><span id="adv-chip-size">3×6 cm</span></div>
+          <div class="adv-chip"><div class="adv-chip-dot"></div><span id="adv-chip-mat">Satin</span></div>
+          <div class="adv-chip"><div class="adv-chip-dot"></div><span id="adv-chip-effects">Standard</span></div>
+        </div>
+        </div>
+
+        <!-- Placement view -->
+        <div id="adv-view-placement" style="display:none;flex:1;overflow-y:auto;padding:16px;">
+          <div class="placement-views" style="padding:0;">
+            <div class="placement-view active" onclick="advSetPlacement(this,'neck')">
+              <div class="placement-view-img"><svg viewBox="0 0 80 80" width="60"><path d="M20 0 Q40 15 60 0 L70 30 L55 35 L55 80 L25 80 L25 35 L10 30Z" fill="rgba(26,95,122,0.12)" stroke="rgba(26,95,122,0.3)" stroke-width="1.5"/><rect x="30" y="7" width="20" height="14" rx="2" fill="white" stroke="rgba(26,95,122,0.4)" stroke-width="1.5"/></svg></div>
+              <div class="placement-name">Neck Inside</div>
+            </div>
+            <div class="placement-view" onclick="advSetPlacement(this,'side')">
+              <div class="placement-view-img"><svg viewBox="0 0 80 80" width="60"><path d="M20 0 Q40 15 60 0 L70 30 L55 35 L55 80 L25 80 L25 35 L10 30Z" fill="rgba(26,95,122,0.12)" stroke="rgba(26,95,122,0.3)" stroke-width="1.5"/><rect x="48" y="45" width="14" height="10" rx="1.5" fill="white" stroke="rgba(26,95,122,0.4)" stroke-width="1.5"/></svg></div>
+              <div class="placement-name">Side Seam</div>
+            </div>
+            <div class="placement-view" onclick="advSetPlacement(this,'hem')">
+              <div class="placement-view-img"><svg viewBox="0 0 80 80" width="60"><path d="M20 0 Q40 15 60 0 L70 30 L55 35 L55 80 L25 80 L25 35 L10 30Z" fill="rgba(26,95,122,0.12)" stroke="rgba(26,95,122,0.3)" stroke-width="1.5"/><rect x="33" y="68" width="14" height="8" rx="1" fill="white" stroke="rgba(26,95,122,0.4)" stroke-width="1.5"/></svg></div>
+              <div class="placement-name">Hem</div>
+            </div>
+            <div class="placement-view" onclick="advSetPlacement(this,'sleeve')">
+              <div class="placement-view-img"><svg viewBox="0 0 80 80" width="60"><path d="M20 0 Q40 15 60 0 L70 30 L55 35 L55 80 L25 80 L25 35 L10 30Z" fill="rgba(26,95,122,0.12)" stroke="rgba(26,95,122,0.3)" stroke-width="1.5"/><rect x="10" y="23" width="14" height="9" rx="1" fill="white" stroke="rgba(26,95,122,0.4)" stroke-width="1.5"/></svg></div>
+              <div class="placement-name">Sleeve</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Specs view -->
+        <div id="adv-view-specs" style="display:none;flex:1;overflow-y:auto;">
+          <div class="specs-grid">
+            <div><div class="spec-label">Label Type</div><div class="spec-value" id="adv-spec-type">Neck Label</div></div>
+            <div><div class="spec-label">Dimensions</div><div class="spec-value" id="adv-spec-dims">3 × 6 cm</div></div>
+            <div><div class="spec-label">Material</div><div class="spec-value" id="adv-spec-mat">Satin</div></div>
+            <div><div class="spec-label">Border</div><div class="spec-value" id="adv-spec-border">None</div></div>
+            <div><div class="spec-label">Orientation</div><div class="spec-value" id="adv-spec-orient">Portrait</div></div>
+            <div><div class="spec-label">Placement</div><div class="spec-value" id="adv-spec-placement">Neck Inside</div></div>
+            <div><div class="spec-label">Background</div><div class="spec-value" id="adv-spec-bgcolor">#ffffff</div></div>
+            <div><div class="spec-label">Text Color</div><div class="spec-value" id="adv-spec-textcolor">#1a2e3b</div></div>
+            <div><div class="spec-label">Font Style</div><div class="spec-value" id="adv-spec-fontstyle">Sans</div></div>
+            <div><div class="spec-label">Brand Name Size</div><div class="spec-value" id="adv-spec-brandsize">16px</div></div>
+            <div><div class="spec-label">Logo Size</div><div class="spec-value" id="adv-spec-logosize">55%</div></div>
+            <div><div class="spec-label">Brand Name</div><div class="spec-value" id="adv-spec-brand">—</div></div>
+            <div><div class="spec-label">Tagline</div><div class="spec-value" id="adv-spec-tagline">—</div></div>
+            <div><div class="spec-label">Composition</div><div class="spec-value" id="adv-spec-composition">—</div></div>
+            <div><div class="spec-label">Origin</div><div class="spec-value" id="adv-spec-origin">—</div></div>
+            <div><div class="spec-label">Size Mark</div><div class="spec-value" id="adv-spec-sizelabel">—</div></div>
+            <div><div class="spec-label">Care Symbols</div><div class="spec-value" id="adv-spec-care">—</div></div>
+            <div><div class="spec-label">CarbonNeutral®</div><div class="spec-value" id="adv-spec-carbon">✅ Yes</div></div>
+            <div><div class="spec-label">Min. Order</div><div class="spec-value">500 pcs</div></div>
+            <div><div class="spec-label">Turnaround</div><div class="spec-value">7–10 days</div></div>
+          </div>
+        </div>
+
+        <div class="adv-action-bar">
+          <button class="btn btn-secondary" onclick="advReset()">↺ Reset</button>
+          <button class="btn btn-primary" onclick="advDownload()">⬇ Download PNG</button>
+          <button class="btn btn-gold" onclick="openQuote()">📩 Get a Quote</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CLOSE CONFIRM -->
+<div id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-icon">⚠️</div>
+    <div class="confirm-title">Discard your work?</div>
+    <div class="confirm-msg">You have unsaved changes in the Pro Builder. If you close now, all your customisations will be lost.</div>
+    <div class="confirm-btns">
+      <button class="btn btn-secondary" onclick="cancelClose()">Keep Editing</button>
+      <button class="btn btn-primary" style="background:linear-gradient(135deg,#c0392b,#922b21);" onclick="confirmClose()">Discard & Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUOTE MODAL -->
+<div id="quote-overlay">
+  <div class="quote-box">
+    <div class="quote-head">
+      <div class="quote-head-icon">📩</div>
+      <div>
+        <div class="quote-head-title">Request a Quote</div>
+        <div class="quote-head-sub">We'll respond within 24 hours</div>
+      </div>
+      <button class="adv-modal-close" style="margin-left:auto;" onclick="closeQuote()">✕</button>
+    </div>
+    <div class="quote-preview-wrap">
+      <img id="quote-canvas-preview" class="quote-preview-canvas" src="" alt="Label Preview" style="display:none;"/>
+      <div class="quote-specs-inline" id="quote-specs-inline"></div>
+    </div>
+    <div class="quote-form-grid">
+      <input type="text" class="q-input" id="q-name" placeholder="Your Name"/>
+      <input type="text" class="q-input" id="q-company" placeholder="Company Name"/>
+    </div>
+    <div class="quote-form-grid">
+      <input type="email" class="q-input" id="q-email" placeholder="Email Address"/>
+      <input type="text" class="q-input" id="q-qty" placeholder="Est. Quantity"/>
+    </div>
+    <div class="quote-form-full">
+      <textarea class="q-input" id="q-note" placeholder="Any additional requirements..." rows="3" style="resize:vertical;"></textarea>
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-bottom:10px;">📎 Your label preview and full specs will be included in the quote request.</div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-secondary" style="flex:1;" onclick="closeQuote()">Cancel</button>
+      <button class="btn btn-gold" style="flex:2;" onclick="submitQuote()">📩 Submit Request</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   CARE SYMBOLS — ISO 3758 genuine wash care symbols (SVG paths)
+═══════════════════════════════════════════════════════ */
+const CARE_SYMBOLS = [
+  {
+    id:'machine_wash', name:'Machine Wash',
+    svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v13a1 1 0 01-1 1H4a1 1 0 01-1-1V7z"/><path d="M3 7V5a1 1 0 011-1h1.5L7 2h10l1.5 2H20a1 1 0 011 1v2"/><circle cx="12" cy="13.5" r="3.5"/></svg>`
+  },
+  {
+    id:'hand_wash', name:'Hand Wash',
+    svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v13a1 1 0 01-1 1H4a1 1 0 01-1-1V7z"/><path d="M3 7V5a1 1 0 011-1h1.5L7 2h10l1.5 2H20a1 1 0 011 1v2"/><path d="M9.5 14.5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5"/><path d="M9 16h6"/></svg>`
+  },
+  {
+    id:'no_wash', name:'Do Not Wash',
+    svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v13a1 1 0 01-1 1H4a1 1 0 01-1-1V7z"/><path d="M3 7V5a1 1 0 011-1h1.5L7 2h10l1.5 2H20a1 1 0 011 1v2"/><line x1="7.5" y1="10.5" x2="16.5" y2="19.5"/><line x1="16.5" y1="10.5" x2="7.5" y2="19.5"/></svg>`
+  },
+  {
+    id:'no_bleach', name:'No Bleach',
+    svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 21L12 3l7.5 18H4.5z"/><line x1="6" y1="15" x2="18" y2="19"/></svg>`
+  },
+  {
+    id:'bleach_ok', name:'Bleach OK',
+    svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 21L12 3l7.5 18H4.5z"/></svg>`
+  },
+  {
+    id:'tumble_dry', name:'Tumble Dry',
+    svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>`
+  },
+  {
+    id:'no_tumble', name:'No Tumble Dry',
+    svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="12" cy="12" r="5"/><line x1="4.5" y1="4.5" x2="19.5" y2="19.5"/></svg>`
+  },
+  {
+    id:'iron', name:'Iron',
+    svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14l-2.5-9h-9L5 17z"/><path d="M5 17q0 2 2 2h10q2 0 2-2"/><path d="M15 8V6"/><circle cx="8.5" cy="13.5" r="0.8" fill="currentColor" stroke="none"/><circle cx="12" cy="13.5" r="0.8" fill="currentColor" stroke="none"/><circle cx="15.5" cy="13.5" r="0.8" fill="currentColor" stroke="none"/></svg>`
+  },
+  {
+    id:'no_iron', name:'No Iron',
+    svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14l-2.5-9h-9L5 17z"/><path d="M5 17q0 2 2 2h10q2 0 2-2"/><line x1="4.5" y1="7" x2="19.5" y2="19"/></svg>`
+  },
+  {
+    id:'dry_clean', name:'Dry Clean',
+    svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg>`
+  },
+  {
+    id:'no_dry_clean', name:'No Dry Clean',
+    svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="4.5" y1="4.5" x2="19.5" y2="19.5"/></svg>`
+  },
+  {
+    id:'flat_dry', name:'Dry Flat',
+    svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`
+  },
+  {
+    id:'hang_dry', name:'Hang Dry',
+    svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M8 9v6a1 1 0 001 1h6a1 1 0 001-1V9"/><path d="M12 9V6"/><line x1="9" y1="9" x2="15" y2="9"/></svg>`
+  },
+  {
+    id:'cold_wash', name:'30° Cold',
+    svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v13a1 1 0 01-1 1H4a1 1 0 01-1-1V7z"/><path d="M3 7V5a1 1 0 011-1h1.5L7 2h10l1.5 2H20a1 1 0 011 1v2"/><text x="8.5" y="17" font-size="5.5" font-family="Arial" font-weight="bold" stroke="none" fill="currentColor">30°</text></svg>`
+  },
+  {
+    id:'warm_wash', name:'40° Warm',
+    svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v13a1 1 0 01-1 1H4a1 1 0 01-1-1V7z"/><path d="M3 7V5a1 1 0 011-1h1.5L7 2h10l1.5 2H20a1 1 0 011 1v2"/><text x="8.5" y="17" font-size="5.5" font-family="Arial" font-weight="bold" stroke="none" fill="currentColor">40°</text></svg>`
+  },
+];
+
+/* ═══════════════════════════════════════════════════════
+   SHARED STATE
+═══════════════════════════════════════════════════════ */
+const S = {
+  type:'neck', widthCm:3, heightCm:6, orientation:'portrait', material:'satin',
+  logoImg:null,
+  bgColor:'#ffffff', borderStyle:'none', cornerRadius:0,
+  logoSize:55, logoOpacity:100,
+  brandName:'', tagline:'', description:'',
+  descBold:false, descItalic:false, descUpper:false, descCenter:false,
+  textColor:'#1a2e3b', fontFamily:'Arial, sans-serif', fontItalic:false, brandFontSize:16,
+  sbCareActive:[],
+  composition:'', origin:'', sizeLabel:'',
+  foil:false, emboss:false, carbon:true,
+  placement:'neck',
+  // pro state
+  advBgColor:'#ffffff', advBorderStyle:'none',
+  advLogoSize:55, advLogoX:0, advLogoY:0,
+  brandBold:false, brandItalic2:false, brandUnderline:false, brandUpper:false,
+  brandSize:16, brandLS:0,
+  tagBold:false, tagItalic:false, tagUnderline:false, tagUpper:false,
+  tagSize:10, tagLH:1.4,
+  advTextColor:'#1a2e3b', advFontFamily:'Arial, sans-serif',
+  careActive:[],
+  blocks:[
+    {id:'composition',label:'Composition',value:'',visible:true},
+    {id:'origin',label:'Country of Origin',value:'',visible:true},
+    {id:'care',label:'Wash Care Symbols',visible:true},
+    {id:'sizelabel',label:'Size Mark',value:'',visible:false},
+    {id:'description',label:'Description',value:'',visible:false,
+     bold:false,italic:false,upper:false},
+  ],
+  advCarbon:true,
+  advPlacement:'neck',
+  advDirty:false
+};
+
+const MATERIAL_NAMES = {satin:'Satin Polyester',matte:'Matte Paper',cotton:'100% Cotton',kraft:'Kraft Paper',transparent:'Clear PVC',recycled:'Recycled Fabric',clear:'Clear PVC'};
+const MAT_NAMES = {satin:'Satin',matte:'Matte',cotton:'Cotton',kraft:'Kraft',transparent:'Clear',clear:'Clear',recycled:'Recycled'};
+const TYPE_NAMES = {neck:'Neck Label',woven:'Woven Label',hangtag:'Hang Tag',heat:'Heat Transfer',sticker:'Sticker Label',tpu:'TPU Label'};
+
+/* ═══════════════════════════════════════════════════════
+   INIT CARE GRIDS
+═══════════════════════════════════════════════════════ */
+function initCareSB(){
+  const g = document.getElementById('sb-care-grid');
+  g.innerHTML = CARE_SYMBOLS.map(s => `
+    <div class="care-btn" id="sb-care-${s.id}" onclick="toggleCareSB('${s.id}')" data-tip="${s.name}">
+      <div class="care-icon" style="color:var(--teal);">${s.svg}</div>
+      <div class="care-btn-label">${s.name}</div>
+    </div>`).join('');
+}
+function initCareAdv(){
+  const g = document.getElementById('adv-care-grid');
+  g.innerHTML = CARE_SYMBOLS.map(s => `
+    <div class="adv-care-btn" id="adv-care-${s.id}" onclick="toggleAdvCare('${s.id}')" data-tip="${s.name}">
+      <div style="color:var(--teal);">${s.svg}</div>
+      <div class="adv-care-name">${s.name}</div>
+    </div>`).join('');
+}
+
+function renderCareActiveList(){
+  const list = document.getElementById('adv-care-active-list');
+  if(!list) return;
+  if(S.careActive.length === 0){ list.innerHTML = '<div style="font-size:10px;color:var(--muted);padding:6px 0;">No care symbols selected.</div>'; return; }
+  list.innerHTML = S.careActive.map((id,i) => {
+    const sym = CARE_SYMBOLS.find(c=>c.id===id);
+    if(!sym) return '';
+    return `<div class="adv-care-active-item" draggable="true" data-care-idx="${i}"
+      ondragstart="careDragStart(event,${i})" ondragover="careDragOver(event,${i})"
+      ondrop="careDrop(event,${i})" ondragleave="careDragLeave(event)">
+      <span class="adv-care-active-drag">⠿</span>
+      <span style="color:var(--teal);">${sym.svg}</span>
+      <span class="adv-care-active-name">${sym.name}</span>
+      <button class="adv-care-remove" onclick="removeAdvCare('${id}')">✕</button>
+    </div>`;
+  }).join('');
+}
+
+let careDragIdx = null;
+function careDragStart(e,i){ careDragIdx=i; e.currentTarget.classList.add('dragging'); }
+function careDragOver(e,i){ e.preventDefault(); if(i!==careDragIdx) e.currentTarget.classList.add('drag-over'); }
+function careDragLeave(e){ e.currentTarget.classList.remove('drag-over'); }
+function careDrop(e,i){
+  e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+  if(careDragIdx===null||careDragIdx===i)return;
+  const arr=[...S.careActive]; const[moved]=arr.splice(careDragIdx,1); arr.splice(i,0,moved);
+  S.careActive=arr; careDragIdx=null; renderCareActiveList(); renderBlockList(); S.advDirty=true; advRender();
+}
+function removeAdvCare(id){
+  const idx=S.careActive.indexOf(id);
+  if(idx>-1){ S.careActive.splice(idx,1); document.getElementById('adv-care-'+id)?.classList.remove('active'); }
+  renderCareActiveList(); renderBlockList(); S.advDirty=true; advRender();
+}
+
+function toggleCareSB(id){
+  const el = document.getElementById('sb-care-'+id);
+  const idx = S.sbCareActive.indexOf(id);
+  if(idx > -1){ S.sbCareActive.splice(idx,1); el.classList.remove('active'); }
+  else { S.sbCareActive.push(id); el.classList.add('active'); }
+  renderLabel();
+}
+function toggleAdvCare(id){
+  const el = document.getElementById('adv-care-'+id);
+  const idx = S.careActive.indexOf(id);
+  if(idx > -1){ S.careActive.splice(idx,1); el.classList.remove('active'); }
+  else { S.careActive.push(id); el.classList.add('active'); }
+  renderCareActiveList();
+  renderBlockList(); // refresh care block preview icons
+  S.advDirty = true; advRender();
+}
+
+/* ═══════════════════════════════════════════════════════
+   BLOCK LIST (Pro)
+═══════════════════════════════════════════════════════ */
+function initBlockList(){ renderBlockList(); }
+function renderBlockList(){
+  const list = document.getElementById('adv-block-list');
+  list.innerHTML = S.blocks.map((b,i) => {
+    let inputField;
+    if(b.id === 'care'){
+      // Special: show compact care symbol preview, no text input
+      const previewIcons = S.careActive.length > 0
+        ? S.careActive.slice(0,6).map(id => {
+            const sym = CARE_SYMBOLS.find(c=>c.id===id);
+            return sym ? `<span style="color:var(--teal);display:inline-flex;align-items:center;">${sym.svg.replace('width="20" height="20"','width="14" height="14"')}</span>` : '';
+          }).join('') + (S.careActive.length > 6 ? `<span style="font-size:9px;color:var(--muted);margin-left:2px;">+${S.careActive.length-6}</span>` : '')
+        : `<span style="font-size:9px;color:var(--muted);">None selected</span>`;
+      inputField = `<div style="flex:1;display:flex;align-items:center;gap:4px;flex-wrap:wrap;min-width:0;">${previewIcons}</div>`;
+    } else if(b.id === 'description'){
+      inputField = `<div style="flex:1;min-width:0;">
+           <div class="block-rt-bar">
+             <button class="block-rt-btn${b.bold?' active':''}" onclick="blockRtToggle(${i},'bold')" title="Bold"><b>B</b></button>
+             <button class="block-rt-btn${b.italic?' active':''}" onclick="blockRtToggle(${i},'italic')" title="Italic"><i>I</i></button>
+             <button class="block-rt-btn${b.upper?' active':''}" onclick="blockRtToggle(${i},'upper')" title="UPPERCASE">AA</button>
+           </div>
+           <textarea style="width:100%;border:1.5px solid var(--border);border-radius:6px;padding:5px 7px;font-size:10px;font-family:'DM Sans',sans-serif;background:var(--surface2);outline:none;min-width:0;resize:vertical;min-height:64px;line-height:1.5;"
+             placeholder="e.g. Handcrafted with premium materials&#10;Sustainably sourced" oninput="blockUpdate(${i},this.value)">${b.value}</textarea>
+         </div>`;
+    } else {
+      inputField = `<input type="text" style="flex:1;border:1.5px solid var(--border);border-radius:6px;padding:4px 7px;font-size:10px;font-family:'DM Sans',sans-serif;background:var(--surface2);outline:none;min-width:0;"
+          placeholder="${b.id==='sizelabel'?'e.g. M':b.id==='origin'?'e.g. Sri Lanka':'e.g. 100% Cotton'}"
+          value="${b.value}" oninput="blockUpdate(${i},this.value)"/>`;
+    }
+    return `<div class="adv-block-item${b.id==='care'?' adv-block-care':''}" draggable="true" data-idx="${i}"
+      ondragstart="blockDragStart(event,${i})" ondragover="blockDragOver(event,${i})"
+      ondrop="blockDrop(event,${i})" ondragleave="blockDragLeave(event)">
+      <span class="adv-block-drag">⠿</span>
+      <span class="adv-block-label" style="${b.id==='care'?'flex-shrink:0;':''}">${b.label}</span>
+      ${inputField}
+      <div class="adv-toggle adv-block-toggle ${b.visible?'on':''}" id="block-t-${i}" onclick="blockToggleVisible(${i})"></div>
+    </div>`;
+  }).join('');
+}
+
+function blockRtToggle(i, prop){
+  S.blocks[i][prop] = !S.blocks[i][prop];
+  S.advDirty = true; renderBlockList(); advRender();
+}
+let dragIdx = null;
+function blockDragStart(e,i){ dragIdx=i; e.currentTarget.classList.add('dragging'); }
+function blockDragOver(e,i){ e.preventDefault(); if(i!==dragIdx) e.currentTarget.classList.add('drag-over'); }
+function blockDragLeave(e){ e.currentTarget.classList.remove('drag-over'); }
+function blockDrop(e,i){
+  e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+  if(dragIdx===null||dragIdx===i)return;
+  const arr=[...S.blocks]; const[moved]=arr.splice(dragIdx,1); arr.splice(i,0,moved);
+  S.blocks=arr; dragIdx=null; renderBlockList(); advRender();
+}
+function blockUpdate(i,val){ S.blocks[i].value=val; S.advDirty=true; advRender(); }
+function blockToggleVisible(i){
+  S.blocks[i].visible=!S.blocks[i].visible;
+  document.getElementById(`block-t-${i}`).classList.toggle('on',S.blocks[i].visible);
+  S.advDirty=true; advRender();
+}
+
+/* ═══════════════════════════════════════════════════════
+   SIMPLE BUILDER — Rich text description toggles
+═══════════════════════════════════════════════════════ */
+function sbRtToggle(prop){
+  const key = 'desc'+prop.charAt(0).toUpperCase()+prop.slice(1);
+  S[key] = !S[key];
+  document.getElementById('sb-rt-'+prop).classList.toggle('active', S[key]);
+  renderLabel();
+}
+
+/* ═══════════════════════════════════════════════════════
+   SIMPLE BUILDER — CONTROL HANDLERS
+═══════════════════════════════════════════════════════ */
+function switchTab(tab){
+  document.querySelectorAll('.ctrl-tab').forEach((t,i)=>{
+    t.classList.toggle('active',['label','brand','care','finish'][i]===tab);
+  });
+  document.querySelectorAll('.ctrl-tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+function setViewTab(el,view){
+  document.querySelectorAll('.view-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('view-canvas').style.display=view==='canvas'?'':'none';
+  document.getElementById('view-placement').style.display=view==='placement'?'':'none';
+  document.getElementById('view-specs').style.display=view==='specs'?'':'none';
+}
+function setType(el,type){
+  document.querySelectorAll('#sb-type-grid .type-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active'); S.type=type; updateInfoChips(); renderLabel();
+}
+function setSize(el,w,h){
+  document.querySelectorAll('#sb-size-row .size-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active'); S.widthCm=w; S.heightCm=h; updateInfoChips(); renderLabel();
+}
+function setOrientation(o){
+  S.orientation=o;
+  document.getElementById('sb-orient-p').classList.toggle('active',o==='portrait');
+  document.getElementById('sb-orient-l').classList.toggle('active',o==='landscape');
+  renderLabel();
+}
+function setBgColor(el,c){
+  document.querySelectorAll('#bg-colors .color-swatch').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active'); S.bgColor=c; renderLabel();
+}
+function setCustomBgColor(v){ S.bgColor=v; renderLabel(); }
+function setTextColor(el,c){
+  document.querySelectorAll('#text-colors .color-swatch').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active'); S.textColor=c; renderLabel();
+}
+function setCustomTextColor(v){ S.textColor=v; renderLabel(); }
+function setFont(el,font){
+  document.querySelectorAll('.font-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  S.fontItalic = font.includes('italic');
+  S.fontFamily = font.replace(' italic','');
+  renderLabel();
+}
+function setLogoSize(v){ S.logoSize=+v; document.getElementById('logo-size-val').textContent=v+'%'; renderLabel(); }
+function setMaterial(el,mat){
+  document.querySelectorAll('#sb-mat-grid .material-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active'); S.material=mat;
+  document.getElementById('chip-material').textContent=MATERIAL_NAMES[mat]||mat;
+  document.getElementById('spec-mat').textContent=MATERIAL_NAMES[mat]||mat;
+  renderLabel();
+}
+function setSizeLabel(el,s){
+  // toggle off if already active
+  if(el.classList.contains('active')){ el.classList.remove('active'); S.sizeLabel=''; renderLabel(); return; }
+  document.querySelectorAll('#sizelabel-grid .size-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active'); S.sizeLabel=s; renderLabel();
+}
+function toggleFeature(feat){
+  const el = document.getElementById('toggle-'+feat);
+  S[feat] = !S[feat];
+  el.classList.toggle('on', S[feat]);
+  if(feat==='carbon') document.getElementById('spec-carbon').textContent=S.carbon?'✅ Yes':'❌ No';
+  renderLabel();
+}
+function setPlacement(el, placement){
+  document.querySelectorAll('#view-placement .placement-view').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  S.placement = placement;
+  updateAllSpecs();
+}
+function advSetPlacement(el, placement){
+  document.querySelectorAll('#adv-view-placement .placement-view').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  S.advPlacement = placement;
+  updateAdvSpecs();
+}
+function advSetViewTab(el, view){
+  document.querySelectorAll('.adv-view-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('adv-view-canvas').style.display = view==='canvas' ? 'flex' : 'none';
+  document.getElementById('adv-view-placement').style.display = view==='placement' ? 'flex' : 'none';
+  document.getElementById('adv-view-specs').style.display = view==='specs' ? 'block' : 'none';
+}
+function updateInfoChips(){
+  document.getElementById('chip-type').textContent=TYPE_NAMES[S.type];
+  document.getElementById('chip-size').textContent=`${S.widthCm}×${S.heightCm} cm`;
+  document.getElementById('spec-type').textContent=TYPE_NAMES[S.type];
+  const dimLabel=S.orientation==='portrait'?`${S.widthCm} × ${S.heightCm} cm`:`${S.heightCm} × ${S.widthCm} cm`;
+  document.getElementById('spec-dims').textContent=dimLabel;
+  document.getElementById('spec-print').textContent=S.type==='woven'?'Woven Weave':S.type==='heat'?'Heat Transfer':'Digital Print';
+}
+const PLACEMENT_NAMES = {neck:'Neck Inside',side:'Side Seam',hem:'Hem',sleeve:'Sleeve'};
+const FONT_STYLE_NAMES = {'Arial, sans-serif':'Sans Serif','Georgia, serif':'Serif','Courier New, monospace':'Monospace'};
+function updateAllSpecs(){
+  updateInfoChips();
+  const brandName = document.getElementById('brand-name').value;
+  const tagline = document.getElementById('tagline').value;
+  const composition = document.getElementById('composition').value;
+  const origin = document.getElementById('origin').value;
+  const brandSize = document.getElementById('brand-size').value;
+  document.getElementById('spec-brand').textContent = brandName||'—';
+  document.getElementById('spec-tagline').textContent = tagline||'—';
+  document.getElementById('spec-composition').textContent = composition||'—';
+  document.getElementById('spec-origin').textContent = origin||'—';
+  document.getElementById('spec-sizelabel').textContent = S.sizeLabel||'—';
+  document.getElementById('spec-orientation').textContent = S.orientation==='portrait'?'Portrait':'Landscape';
+  document.getElementById('spec-bgcolor').textContent = S.bgColor.toUpperCase();
+  document.getElementById('spec-textcolor').textContent = S.textColor.toUpperCase();
+  const fontKey = S.fontFamily.replace(' italic','');
+  document.getElementById('spec-fontstyle').textContent = FONT_STYLE_NAMES[fontKey]||(S.fontItalic?'Italic':'—');
+  document.getElementById('spec-brandsize').textContent = (brandSize||16)+'px';
+  document.getElementById('spec-logosize').textContent = S.logoSize+'%';
+  document.getElementById('spec-placement').textContent = PLACEMENT_NAMES[S.placement]||'Neck Inside';
+  const activeNames = S.sbCareActive.map(id => CARE_SYMBOLS.find(c=>c.id===id)?.name||id);
+  document.getElementById('spec-care').textContent = activeNames.length ? activeNames.join(', ') : '—';
+}
+
+/* ═══════════════════════════════════════════════════════
+   LOGO UPLOAD (SIMPLE)
+═══════════════════════════════════════════════════════ */
+function handleLogoUpload(input){
+  const file=input.files[0]; if(!file)return;
+  if(file.size>5*1024*1024){ alert('File too large. Max 5MB.'); return; }
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      S.logoImg=img;
+      document.getElementById('logo-preview-img').src=e.target.result;
+      document.getElementById('logo-preview-name').textContent=file.name;
+      document.getElementById('logo-preview').style.display='flex';
+      document.getElementById('adv-logo-preview-img').src=e.target.result;
+      document.getElementById('adv-logo-preview-name').textContent=file.name;
+      document.getElementById('adv-logo-preview').style.display='flex';
+      renderLabel();
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function removeLogo(){
+  S.logoImg=null;
+  document.getElementById('logo-preview').style.display='none';
+  document.getElementById('logo-input').value='';
+  document.getElementById('adv-logo-preview').style.display='none';
+  document.getElementById('adv-logo-input').value='';
+  renderLabel();
+}
+const uz=document.getElementById('upload-zone');
+uz.addEventListener('dragover',e=>{e.preventDefault();uz.classList.add('drag-over');});
+uz.addEventListener('dragleave',()=>uz.classList.remove('drag-over'));
+uz.addEventListener('drop',e=>{
+  e.preventDefault(); uz.classList.remove('drag-over');
+  const f=e.dataTransfer.files[0];
+  if(f){ document.getElementById('logo-input').files=e.dataTransfer.files; handleLogoUpload(document.getElementById('logo-input')); }
+});
+
+/* ═══════════════════════════════════════════════════════
+   DRAW CARE SYMBOL ON CANVAS (vector paths)
+═══════════════════════════════════════════════════════ */
+function drawCareSymbol(ctx, id, cx, cy, size, color){
+  ctx.save();
+  const s = size;
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = Math.max(0.6, s * 0.065);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  // Translate so we draw at cx,cy center
+  ctx.translate(cx - s/2, cy - s/2);
+  ctx.beginPath();
+
+  switch(id){
+    case 'machine_wash':
+    case 'cold_wash':
+    case 'warm_wash':
+    case 'hand_wash':
+    case 'no_wash': {
+      // Tub outline
+      const inset = s*0.12;
+      ctx.rect(inset, s*0.32, s-inset*2, s*0.6);
+      ctx.stroke(); ctx.beginPath();
+      // Lid triangle piece
+      ctx.moveTo(inset, s*0.32);
+      ctx.lineTo(inset, s*0.24);
+      ctx.lineTo(inset+s*0.12, s*0.32);
+      ctx.stroke(); ctx.beginPath();
+      ctx.moveTo(s-inset, s*0.32);
+      ctx.lineTo(s-inset, s*0.24);
+      ctx.lineTo(s-inset-s*0.12, s*0.32);
+      ctx.stroke(); ctx.beginPath();
+      ctx.moveTo(inset+s*0.12, s*0.24);
+      ctx.lineTo(s-inset-s*0.12, s*0.24);
+      ctx.stroke();
+      if(id==='machine_wash'){
+        ctx.beginPath();
+        ctx.arc(s/2, s*0.65, s*0.18, 0, Math.PI*2);
+        ctx.stroke();
+      } else if(id==='hand_wash'){
+        ctx.beginPath();
+        ctx.moveTo(s*0.35, s*0.58); ctx.lineTo(s*0.5, s*0.52); ctx.lineTo(s*0.65, s*0.58);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(s*0.35, s*0.72); ctx.lineTo(s*0.65, s*0.72);
+        ctx.stroke();
+      } else if(id==='no_wash'){
+        ctx.beginPath();
+        ctx.moveTo(inset, s*0.35); ctx.lineTo(s-inset, s*0.87);
+        ctx.stroke(); ctx.beginPath();
+        ctx.moveTo(s-inset, s*0.35); ctx.lineTo(inset, s*0.87);
+        ctx.stroke();
+      } else if(id==='cold_wash'){
+        ctx.font=`bold ${s*0.28}px Arial`;
+        ctx.fillText('30°', s*0.28, s*0.76);
+      } else if(id==='warm_wash'){
+        ctx.font=`bold ${s*0.28}px Arial`;
+        ctx.fillText('40°', s*0.28, s*0.76);
+      }
+      break;
+    }
+    case 'no_bleach':
+    case 'bleach_ok': {
+      // Triangle
+      ctx.moveTo(s*0.5, s*0.06);
+      ctx.lineTo(s*0.92, s*0.94);
+      ctx.lineTo(s*0.08, s*0.94);
+      ctx.closePath(); ctx.stroke();
+      if(id==='no_bleach'){
+        ctx.beginPath();
+        ctx.moveTo(s*0.2, s*0.62); ctx.lineTo(s*0.8, s*0.84);
+        ctx.stroke();
+      }
+      break;
+    }
+    case 'tumble_dry':
+    case 'no_tumble': {
+      ctx.rect(s*0.08, s*0.08, s*0.84, s*0.84);
+      ctx.stroke(); ctx.beginPath();
+      ctx.arc(s/2, s/2, s*0.3, 0, Math.PI*2);
+      ctx.stroke(); ctx.beginPath();
+      ctx.arc(s/2, s/2, s*0.1, 0, Math.PI*2);
+      ctx.fill();
+      if(id==='no_tumble'){
+        ctx.beginPath();
+        ctx.moveTo(s*0.12, s*0.12); ctx.lineTo(s*0.88, s*0.88);
+        ctx.stroke();
+      }
+      break;
+    }
+    case 'iron':
+    case 'no_iron': {
+      ctx.moveTo(s*0.06, s*0.88); ctx.lineTo(s*0.94, s*0.88);
+      ctx.lineTo(s*0.88, s*0.46); ctx.lineTo(s*0.12, s*0.46);
+      ctx.closePath(); ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(s*0.32, s*0.7, s*0.05, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath();
+      ctx.arc(s*0.5, s*0.7, s*0.05, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath();
+      ctx.arc(s*0.68, s*0.7, s*0.05, 0, Math.PI*2); ctx.fill();
+      if(id==='no_iron'){
+        ctx.beginPath();
+        ctx.moveTo(s*0.08, s*0.48); ctx.lineTo(s*0.92, s*0.86);
+        ctx.stroke();
+      }
+      break;
+    }
+    case 'dry_clean':
+    case 'no_dry_clean': {
+      ctx.arc(s/2, s/2, s*0.42, 0, Math.PI*2);
+      ctx.stroke();
+      if(id==='no_dry_clean'){
+        ctx.beginPath();
+        ctx.moveTo(s*0.2, s*0.2); ctx.lineTo(s*0.8, s*0.8);
+        ctx.stroke();
+      }
+      break;
+    }
+    case 'flat_dry': {
+      ctx.rect(s*0.08, s*0.08, s*0.84, s*0.84);
+      ctx.stroke(); ctx.beginPath();
+      ctx.moveTo(s*0.22, s/2); ctx.lineTo(s*0.78, s/2);
+      ctx.stroke();
+      break;
+    }
+    case 'hang_dry': {
+      ctx.rect(s*0.08, s*0.08, s*0.84, s*0.84);
+      ctx.stroke(); ctx.beginPath();
+      ctx.moveTo(s*0.28, s*0.4); ctx.lineTo(s*0.28, s*0.76);
+      ctx.lineTo(s*0.72, s*0.76); ctx.lineTo(s*0.72, s*0.4);
+      ctx.stroke(); ctx.beginPath();
+      ctx.moveTo(s*0.2, s*0.4); ctx.lineTo(s*0.8, s*0.4);
+      ctx.stroke(); ctx.beginPath();
+      ctx.moveTo(s/2, s*0.22); ctx.lineTo(s/2, s*0.4);
+      ctx.stroke();
+      break;
+    }
+    default: break;
+  }
+  ctx.restore();
+}
+
+/* ═══════════════════════════════════════════════════════
+   SIMPLE BUILDER — CANVAS RENDER
+═══════════════════════════════════════════════════════ */
+function renderLabel(){
+  const canvas = document.getElementById('label-canvas');
+  const ctx = canvas.getContext('2d');
+  const PX_PER_CM = 40;
+  let w = S.widthCm * PX_PER_CM, h = S.heightCm * PX_PER_CM;
+  if(S.orientation==='landscape') [w,h] = [h,w];
+  canvas.width = w; canvas.height = h;
+
+  ctx.clearRect(0,0,w,h);
+
+  // Background
+  if(S.material==='satin'){
+    const g = ctx.createLinearGradient(0,0,w,h);
+    g.addColorStop(0,S.bgColor); g.addColorStop(0.4,lighten(S.bgColor,15));
+    g.addColorStop(0.7,S.bgColor); g.addColorStop(1,darken(S.bgColor,10));
+    ctx.fillStyle = g;
+  } else if(S.material==='kraft'){ ctx.fillStyle='#c8a87a'; }
+  else if(S.material==='transparent'){ ctx.fillStyle='rgba(220,235,245,0.3)'; }
+  else { ctx.fillStyle = S.bgColor; }
+  ctx.fillRect(0,0,w,h);
+
+  const pad = Math.round(Math.min(w,h)*0.08);
+  const contentW = w - pad*2;
+
+  // Size label — fixed top-right corner, matches text color
+  if(S.sizeLabel){
+    const bw = Math.max(22, S.sizeLabel.length*8+8), bh = 18;
+    const bx = w - bw - 5, by = 5;
+    ctx.fillStyle = hexToRgba(S.textColor, 0.12);
+    roundRectFill(ctx, bx, by, bw, bh, 3);
+    ctx.strokeStyle = hexToRgba(S.textColor, 0.4);
+    ctx.lineWidth = 1;
+    roundRect(ctx, bx, by, bw, bh, 3); ctx.stroke();
+    ctx.fillStyle = S.textColor;
+    ctx.font = `bold 10px Arial`;
+    ctx.textAlign = 'center';
+    ctx.fillText(S.sizeLabel, bx + bw/2, by + 12);
+  }
+
+  let cursor = pad;
+
+  // Logo
+  if(S.logoImg){
+    const maxLogoH = (h * S.logoSize/100) * 0.45;
+    const maxLogoW = contentW * 0.85;
+    let lw = S.logoImg.width, lh = S.logoImg.height;
+    const sc = Math.min(maxLogoW/lw, maxLogoH/lh);
+    lw *= sc; lh *= sc;
+    ctx.globalAlpha = S.logoOpacity/100;
+    ctx.drawImage(S.logoImg, (w-lw)/2, cursor, lw, lh);
+    ctx.globalAlpha = 1;
+    cursor += lh + pad*0.5;
+  } else {
+    const phH = Math.round(h*0.22), phW = Math.round(contentW*0.6), phX = (w-phW)/2;
+    ctx.fillStyle = 'rgba(26,95,122,0.07)';
+    roundRectFill(ctx, phX, cursor, phW, phH, 4);
+    ctx.fillStyle = 'rgba(26,95,122,0.25)';
+    ctx.font = `${Math.round(phH*0.28)}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.fillText('YOUR LOGO', w/2, cursor + phH/2 + phH*0.1);
+    cursor += phH + pad*0.5;
+  }
+
+  // Separator
+  ctx.strokeStyle = hexToRgba(S.textColor, 0.15);
+  ctx.lineWidth = 0.8; ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(pad, cursor); ctx.lineTo(w-pad, cursor); ctx.stroke();
+  cursor += pad*0.5;
+
+  const brandName = document.getElementById('brand-name').value;
+  const tagline = document.getElementById('tagline').value;
+  const description = document.getElementById('description').value;
+  const composition = document.getElementById('composition').value;
+  const origin = document.getElementById('origin').value;
+  const brandFontSize = +document.getElementById('brand-size').value;
+  document.getElementById('brand-size-val').textContent = brandFontSize+'px';
+
+  ctx.fillStyle = S.textColor;
+  ctx.textAlign = 'center';
+
+  // Brand name
+  if(brandName){
+    ctx.font = `${S.fontItalic?'bold italic':'bold'} ${brandFontSize}px ${S.fontFamily}`;
+    ctx.fillText(brandName, w/2, cursor + brandFontSize);
+    cursor += brandFontSize + 5;
+  }
+  // Tagline
+  if(tagline){
+    ctx.font = `${S.fontItalic?'italic':''} ${Math.round(brandFontSize*0.65)}px ${S.fontFamily}`;
+    ctx.fillStyle = hexToRgba(S.textColor, 0.65);
+    ctx.fillText(tagline, w/2, cursor + brandFontSize*0.65);
+    cursor += brandFontSize*0.65 + 5;
+  }
+  if(brandName || tagline) cursor += pad*0.3;
+
+  // Description (rich text multi-line)
+  if(description.trim()){
+    const dFontSize = Math.round(brandFontSize * 0.55);
+    let fontStr = '';
+    if(S.descBold) fontStr += 'bold ';
+    if(S.descItalic) fontStr += 'italic ';
+    fontStr += `${dFontSize}px ${S.fontFamily}`;
+    ctx.font = fontStr;
+    ctx.fillStyle = hexToRgba(S.textColor, 0.7);
+    const descText = S.descUpper ? description.toUpperCase() : description;
+    const lines = descText.split('\n');
+    const lineH = dFontSize * 1.4;
+    lines.forEach((line, li) => {
+      if(line.trim()){
+        ctx.textAlign = S.descCenter ? 'center' : 'center';
+        ctx.fillText(line.trim(), w/2, cursor + dFontSize + li * lineH);
+      }
+    });
+    cursor += lines.length * lineH + 4;
+  }
+  if(description.trim()) cursor += pad*0.2;
+
+  // Separator before care
+  if(S.sbCareActive.length > 0 && cursor < h - pad*4){
+    ctx.strokeStyle = hexToRgba(S.textColor, 0.1);
+    ctx.lineWidth = 0.5; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(pad*2, cursor); ctx.lineTo(w-pad*2, cursor); ctx.stroke();
+    ctx.setLineDash([]);
+    cursor += 5;
+  }
+
+  // Care symbols — genuine SVG-based rendering
+  if(S.sbCareActive.length > 0){
+    const symSize = Math.min(16, (contentW - (S.sbCareActive.length-1)*3) / S.sbCareActive.length);
+    const totalW = S.sbCareActive.length * (symSize + 3) - 3;
+    let sx = (w - totalW) / 2;
+    S.sbCareActive.forEach(id => {
+      drawCareSymbol(ctx, id, sx + symSize/2, cursor + symSize/2, symSize, S.textColor);
+      sx += symSize + 3;
+    });
+    cursor += symSize + 6;
+  }
+
+  // FIXED BOTTOM SECTION — composition, origin, carbon
+  // These are anchored from the bottom
+  const bottomPad = 8;
+  let bottomCursor = h - bottomPad;
+
+  // Carbon neutral (very bottom)
+  if(S.carbon){
+    ctx.font = `bold 6px Arial`;
+    ctx.fillStyle = hexToRgba(S.textColor, 0.38);
+    ctx.textAlign = 'center';
+    ctx.fillText('CarbonNeutral®', w/2, bottomCursor);
+    bottomCursor -= 9;
+  }
+
+  // Origin (above carbon)
+  if(origin){
+    ctx.font = `7px Arial`;
+    ctx.fillStyle = hexToRgba(S.textColor, 0.45);
+    ctx.textAlign = 'center';
+    ctx.fillText(origin, w/2, bottomCursor);
+    bottomCursor -= 10;
+  }
+
+  // Composition (above origin)
+  if(composition){
+    ctx.font = `bold 7px Arial`;
+    ctx.fillStyle = hexToRgba(S.textColor, 0.55);
+    ctx.textAlign = 'center';
+    ctx.fillText(composition, w/2, bottomCursor);
+    bottomCursor -= 10;
+  }
+
+  // Thin separator line above fixed section
+  if(composition || origin || S.carbon){
+    ctx.strokeStyle = hexToRgba(S.textColor, 0.1);
+    ctx.lineWidth = 0.5; ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(pad, bottomCursor); ctx.lineTo(w-pad, bottomCursor); ctx.stroke();
+  }
+
+  updateAllSpecs();
+}
+
+/* ═══════════════════════════════════════════════════════
+   PRO BUILDER — CONTROLS
+═══════════════════════════════════════════════════════ */
+function advTab(el,name){
+  document.querySelectorAll('.adv-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.adv-tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('adv-tab-'+name).classList.add('active');
+}
+function advSetType(el,t){
+  document.querySelectorAll('#adv-type-grid .adv-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active'); S.type=t; S.advDirty=true;
+  const types=['neck','woven','hangtag','heat','sticker','tpu'];
+  document.querySelectorAll('#sb-type-grid .type-pill').forEach((p,i)=>p.classList.toggle('active',types[i]===t));
+  advRender(); renderLabel();
+}
+function advSetSize(el,w,h){
+  document.querySelectorAll('#adv-size-row .adv-size-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active'); S.widthCm=w; S.heightCm=h; S.advDirty=true;
+  advRender(); renderLabel();
+}
+function advSetOrient(o){
+  S.orientation=o; S.advDirty=true;
+  document.getElementById('adv-op').classList.toggle('active',o==='portrait');
+  document.getElementById('adv-ol').classList.toggle('active',o==='landscape');
+  document.getElementById('sb-orient-p').classList.toggle('active',o==='portrait');
+  document.getElementById('sb-orient-l').classList.toggle('active',o==='landscape');
+  advRender(); renderLabel();
+}
+function advSetMat(el,m){
+  document.querySelectorAll('#adv-mat-grid .adv-mat-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active'); S.material=m; S.advDirty=true;
+  advRender(); renderLabel();
+}
+function advSetBg(el,c){
+  document.querySelectorAll('#adv-bg-colors .adv-swatch').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active'); S.advBgColor=c; S.advDirty=true; advRender();
+}
+function advSetBgCustom(c){ S.advBgColor=c; S.advDirty=true; advRender(); }
+function advSetBorder(el,b){
+  document.querySelectorAll('.adv-border-btn').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active'); S.advBorderStyle=b; S.advDirty=true; advRender();
+}
+function advSetTextColor(el,c){
+  document.querySelectorAll('#adv-text-colors .adv-swatch').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active'); S.advTextColor=c; S.advDirty=true; advRender();
+}
+function advSetTextColorCustom(c){ S.advTextColor=c; S.advDirty=true; advRender(); }
+function advSetFont(el,f){
+  document.querySelectorAll('.adv-font-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active'); S.advFontFamily=f; S.advDirty=true; advRender();
+}
+function advHandleLogo(input){
+  const f=input.files[0]; if(!f)return;
+  if(f.size>5*1024*1024){ alert('Max 5MB'); return; }
+  const r=new FileReader();
+  r.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      S.logoImg=img;
+      document.getElementById('adv-logo-preview-img').src=e.target.result;
+      document.getElementById('adv-logo-preview-name').textContent=f.name;
+      document.getElementById('adv-logo-preview').style.display='flex';
+      document.getElementById('logo-preview-img').src=e.target.result;
+      document.getElementById('logo-preview-name').textContent=f.name;
+      document.getElementById('logo-preview').style.display='flex';
+      S.advDirty=true; advRender(); renderLabel();
+    };
+    img.src=e.target.result;
+  };
+  r.readAsDataURL(f);
+}
+function advRemoveLogo(){
+  S.logoImg=null;
+  document.getElementById('adv-logo-preview').style.display='none';
+  document.getElementById('adv-logo-input').value='';
+  document.getElementById('logo-preview').style.display='none';
+  document.getElementById('logo-input').value='';
+  S.advDirty=true; advRender(); renderLabel();
+}
+const advUZ=document.getElementById('adv-upload-zone');
+advUZ.addEventListener('dragover',e=>{e.preventDefault();advUZ.classList.add('drag-over');});
+advUZ.addEventListener('dragleave',()=>advUZ.classList.remove('drag-over'));
+advUZ.addEventListener('drop',e=>{
+  e.preventDefault(); advUZ.classList.remove('drag-over');
+  const dt=e.dataTransfer.files[0];
+  if(dt){ document.getElementById('adv-logo-input').files=e.dataTransfer.files; advHandleLogo(document.getElementById('adv-logo-input')); }
+});
+function advToggleEffect(eff){
+  const key='adv'+eff.charAt(0).toUpperCase()+eff.slice(1);
+  S[key]=!S[key];
+  document.getElementById('adv-t-'+eff).classList.toggle('on',S[key]);
+  S.advDirty=true; advRender();
+}
+function rtToggle(field,prop){
+  const key=field==='brand'?'brand'+prop.charAt(0).toUpperCase()+prop.slice(1):'tag'+prop.charAt(0).toUpperCase()+prop.slice(1);
+  S[key]=!S[key];
+  const btnId=`rt-${field==='brand'?'bn':'tg'}-${prop}`;
+  document.getElementById(btnId).classList.toggle('active',S[key]);
+  S.advDirty=true; advRender();
+}
+
+/* ═══════════════════════════════════════════════════════
+   PRO BUILDER — CANVAS RENDER
+═══════════════════════════════════════════════════════ */
+function advRender(){
+  const lsEl=document.getElementById('adv-logo-size');
+  const lxEl=document.getElementById('adv-logo-x');
+  const lyEl=document.getElementById('adv-logo-y');
+  const bnSz=document.getElementById('adv-bn-size');
+  const bnLs=document.getElementById('adv-bn-ls');
+  const tgSz=document.getElementById('adv-tg-size');
+  const tgLh=document.getElementById('adv-tg-lh');
+  if(lsEl){ S.advLogoSize=+lsEl.value; document.getElementById('adv-logo-size-val').textContent=S.advLogoSize+'%'; }
+  if(lxEl){ S.advLogoX=+lxEl.value; document.getElementById('adv-logo-x-val').textContent=S.advLogoX; }
+  if(lyEl){ S.advLogoY=+lyEl.value; document.getElementById('adv-logo-y-val').textContent=S.advLogoY; }
+  if(bnSz){ S.brandSize=+bnSz.value; document.getElementById('adv-bn-size-val').textContent=S.brandSize; }
+  if(bnLs){ S.brandLS=+bnLs.value; document.getElementById('adv-bn-ls-val').textContent=S.brandLS; }
+  if(tgSz){ S.tagSize=+tgSz.value; document.getElementById('adv-tg-size-val').textContent=S.tagSize; }
+  if(tgLh){ S.tagLH=+tgLh.value; document.getElementById('adv-tg-lh-val').textContent=S.tagLH; }
+
+  const brandTxtRaw = document.getElementById('adv-brand-text')?.value||'';
+  const tagTxtRaw = document.getElementById('adv-tagline-text')?.value||'';
+
+  const canvas = document.getElementById('adv-canvas');
+  const ctx = canvas.getContext('2d');
+  const PX = 40;
+  let w = S.widthCm*PX, h = S.heightCm*PX;
+  if(S.orientation==='landscape') [w,h]=[h,w];
+  const maxW=260, maxH=380;
+  const sc = Math.min(maxW/w, maxH/h, 2.0);
+  canvas.width = Math.round(w*sc); canvas.height = Math.round(h*sc);
+  ctx.scale(sc, sc);
+
+  const bgColor = S.advBgColor;
+  const pad = Math.round(Math.min(w,h)*0.09);
+  ctx.clearRect(0,0,w,h);
+
+  // Background
+  if(S.material==='kraft'){ ctx.fillStyle='#c9a87c'; }
+  else if(S.material==='transparent'||S.material==='clear'){ ctx.fillStyle='rgba(200,230,245,0.25)'; }
+  else if(S.material==='satin'){
+    const sg=ctx.createLinearGradient(0,0,w,h);
+    sg.addColorStop(0,bgColor); sg.addColorStop(0.45,lighten(bgColor,18));
+    sg.addColorStop(0.7,bgColor); sg.addColorStop(1,darken(bgColor,12));
+    ctx.fillStyle=sg;
+  } else { ctx.fillStyle=bgColor; }
+  ctx.fillRect(0,0,w,h);
+
+  // Border
+  if(S.advBorderStyle!=='none'){
+    ctx.save();
+    const bc=S.advTextColor;
+    if(S.advBorderStyle==='thin'){ ctx.strokeStyle=bc; ctx.lineWidth=1.5; ctx.setLineDash([]); }
+    else if(S.advBorderStyle==='thick'){ ctx.strokeStyle=bc; ctx.lineWidth=4; ctx.setLineDash([]); }
+    else if(S.advBorderStyle==='dashed'){ ctx.setLineDash([6,4]); ctx.strokeStyle=bc; ctx.lineWidth=1.5; }
+    else if(S.advBorderStyle==='double'){ ctx.strokeStyle=bc; ctx.lineWidth=1.5; ctx.setLineDash([]); }
+    else if(S.advBorderStyle==='stitched'){ ctx.setLineDash([4,3]); ctx.strokeStyle=bc; ctx.lineWidth=1; }
+    ctx.strokeRect(3,3,w-6,h-6);
+    if(S.advBorderStyle==='double') ctx.strokeRect(6,6,w-12,h-12);
+    if(S.advBorderStyle==='stitched') ctx.strokeRect(7,7,w-14,h-14);
+    ctx.restore();
+  }
+
+  let cursor = pad;
+  const textColor = S.advTextColor;
+  const contentW = w - pad*2;
+
+  // Logo
+  if(S.logoImg){
+    const maxLogoH = (h*(S.advLogoSize/100))*0.5;
+    const maxLogoW = contentW*0.85;
+    let lw=S.logoImg.width, lh=S.logoImg.height;
+    const sc2=Math.min(maxLogoW/lw, maxLogoH/lh);
+    lw*=sc2; lh*=sc2;
+    const offsetX=(S.advLogoX/100)*contentW*0.5;
+    const offsetY=(S.advLogoY/100)*h*0.1;
+    ctx.drawImage(S.logoImg,(w-lw)/2+offsetX,cursor+offsetY,lw,lh);
+    cursor+=lh+pad*0.5;
+  } else {
+    const phH=Math.round(h*0.2),phW=Math.round(contentW*0.55),phX=(w-phW)/2;
+    ctx.fillStyle=hexToRgba(textColor,0.06); ctx.fillRect(phX,cursor,phW,phH);
+    ctx.fillStyle=hexToRgba(textColor,0.22);
+    ctx.font=`bold ${Math.round(phH*0.28)}px Arial`; ctx.textAlign='center';
+    ctx.fillText('YOUR LOGO',w/2,cursor+phH/2+phH*0.1);
+    cursor+=phH+pad*0.5;
+  }
+
+  // Separator
+  ctx.strokeStyle=hexToRgba(textColor,0.12); ctx.lineWidth=0.8; ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(pad,cursor); ctx.lineTo(w-pad,cursor); ctx.stroke();
+  cursor+=pad*0.4;
+
+  // Brand
+  const brandTxt=S.brandUpper?brandTxtRaw.toUpperCase():brandTxtRaw;
+  if(brandTxt){
+    let fontStr='';
+    if(S.brandBold) fontStr+='bold ';
+    if(S.brandItalic2) fontStr+='italic ';
+    fontStr+=`${S.brandSize}px ${S.advFontFamily}`;
+    ctx.font=fontStr; ctx.fillStyle=textColor; ctx.textAlign='center';
+    if(S.brandLS>0){
+      drawTextWithSpacing(ctx,brandTxt,w/2,cursor+S.brandSize,S.brandLS,S.brandUnderline,S.brandSize);
+    } else {
+      ctx.fillText(brandTxt,w/2,cursor+S.brandSize);
+      if(S.brandUnderline){
+        const tw=ctx.measureText(brandTxt).width;
+        ctx.strokeStyle=textColor; ctx.lineWidth=0.8;
+        ctx.beginPath(); ctx.moveTo(w/2-tw/2,cursor+S.brandSize+1.5); ctx.lineTo(w/2+tw/2,cursor+S.brandSize+1.5); ctx.stroke();
+      }
+    }
+    cursor+=S.brandSize+5;
+  }
+
+  // Tagline
+  const tagTxt=S.tagUpper?tagTxtRaw.toUpperCase():tagTxtRaw;
+  if(tagTxt){
+    let fontStr='';
+    if(S.tagBold) fontStr+='bold ';
+    if(S.tagItalic) fontStr+='italic ';
+    fontStr+=`${S.tagSize}px ${S.advFontFamily}`;
+    ctx.font=fontStr; ctx.fillStyle=hexToRgba(textColor,0.72); ctx.textAlign='center';
+    tagTxt.split('\n').forEach((line,li)=>{
+      const y=cursor+S.tagSize+(li*S.tagSize*S.tagLH);
+      ctx.fillText(line,w/2,y);
+      if(S.tagUnderline){
+        const tw=ctx.measureText(line).width;
+        ctx.strokeStyle=hexToRgba(textColor,0.72); ctx.lineWidth=0.8;
+        ctx.beginPath(); ctx.moveTo(w/2-tw/2,y+1.5); ctx.lineTo(w/2+tw/2,y+1.5); ctx.stroke();
+      }
+    });
+    cursor+=S.tagSize*S.tagLH*tagTxt.split('\n').length+6;
+  }
+  if(brandTxt||tagTxt) cursor+=pad*0.2;
+
+  // Blocks + care symbols — rendered in user-defined order
+  ctx.textAlign='center';
+  S.blocks.filter(b=>b.visible).forEach(b=>{
+    if(b.id==='care'){
+      // Render care symbols at this position in the order
+      if(S.careActive.length>0){
+        const symSz=Math.min(16,(contentW-(S.careActive.length-1)*4)/S.careActive.length);
+        const totalW=S.careActive.length*(symSz+4)-4;
+        let sx=(w-totalW)/2;
+        S.careActive.forEach(id=>{
+          drawCareSymbol(ctx, id, sx+symSz/2, cursor+symSz/2, symSz, textColor);
+          sx+=symSz+4;
+        });
+        cursor+=symSz+8;
+      }
+    } else if(b.value && b.id==='sizelabel'){
+      // Render size mark as a badge
+      const szTxt = b.value;
+      const bw = Math.max(18, szTxt.length*7+8), bh = 14;
+      const bx = (w-bw)/2;
+      ctx.fillStyle = hexToRgba(textColor, 0.1);
+      roundRectFill(ctx, bx, cursor, bw, bh, 3);
+      ctx.strokeStyle = hexToRgba(textColor, 0.35); ctx.lineWidth=0.8;
+      roundRect(ctx, bx, cursor, bw, bh, 3); ctx.stroke();
+      ctx.font=`bold 9px Arial`; ctx.fillStyle=textColor; ctx.textAlign='center';
+      ctx.fillText(szTxt, w/2, cursor+10);
+      cursor+=bh+4;
+    } else if(b.value){
+      let fontParts = '';
+      if(b.id==='description'){ if(b.bold) fontParts+='bold '; if(b.italic) fontParts+='italic '; }
+      else if(b.id==='composition') fontParts='bold ';
+      ctx.font=`${fontParts}8px Arial`;
+      ctx.fillStyle=hexToRgba(textColor, b.id==='description'?0.65:0.5);
+      ctx.textAlign='center';
+      const displayText = (b.id==='description' && b.upper) ? b.value.toUpperCase() : b.value;
+      displayText.split('\n').forEach((line,li)=>{
+        ctx.fillText(line, w/2, cursor+8+li*11);
+      });
+      cursor+=displayText.split('\n').length*11;
+    }
+  });
+
+  // CarbonNeutral fixed at bottom
+  if(S.advCarbon){
+    ctx.font=`bold 6px Arial`; ctx.fillStyle=hexToRgba(textColor,0.35); ctx.textAlign='center';
+    ctx.fillText('CarbonNeutral®', w/2, h-6);
+  }
+
+  ctx.setTransform(1,0,0,1,0,0);
+
+  // Update specs panel
+  updateAdvSpecs();
+  S.advDirty=true;
+}
+
+function updateAdvSpecs(){
+  const dimStr=S.orientation==='portrait'?`${S.widthCm} × ${S.heightCm} cm`:`${S.heightCm} × ${S.widthCm} cm`;
+  const brandTxt = document.getElementById('adv-brand-text')?.value||'—';
+  const tagTxt = document.getElementById('adv-tagline-text')?.value||'—';
+  const composition = S.blocks.find(b=>b.id==='composition')?.value||'—';
+  const origin = S.blocks.find(b=>b.id==='origin')?.value||'—';
+  const sizelabel = S.blocks.find(b=>b.id==='sizelabel')?.value||'—';
+  const activeNames = S.careActive.map(id=>CARE_SYMBOLS.find(c=>c.id===id)?.name||id);
+  const fontStyle = FONT_STYLE_NAMES?.[S.advFontFamily] || S.advFontFamily.split(',')[0];
+
+  const setEl = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+  setEl('adv-spec-type', TYPE_NAMES[S.type]);
+  setEl('adv-spec-dims', dimStr);
+  setEl('adv-spec-mat', MATERIAL_NAMES[S.material]||S.material);
+  setEl('adv-spec-border', S.advBorderStyle.charAt(0).toUpperCase()+S.advBorderStyle.slice(1));
+  setEl('adv-spec-orient', S.orientation==='portrait'?'Portrait':'Landscape');
+  setEl('adv-spec-placement', PLACEMENT_NAMES?.[S.advPlacement]||'Neck Inside');
+  setEl('adv-spec-bgcolor', S.advBgColor.toUpperCase());
+  setEl('adv-spec-textcolor', S.advTextColor.toUpperCase());
+  setEl('adv-spec-fontstyle', fontStyle);
+  setEl('adv-spec-brandsize', S.brandSize+'px');
+  setEl('adv-spec-logosize', S.advLogoSize+'%');
+  setEl('adv-spec-brand', brandTxt||'—');
+  setEl('adv-spec-tagline', tagTxt||'—');
+  setEl('adv-spec-composition', composition||'—');
+  setEl('adv-spec-origin', origin||'—');
+  setEl('adv-spec-sizelabel', sizelabel||'—');
+  setEl('adv-spec-care', activeNames.length?activeNames.join(', '):'—');
+  setEl('adv-spec-carbon', S.advCarbon?'✅ Yes':'❌ No');
+
+  // Update chips
+  const chipDimStr=S.orientation==='portrait'?`${S.widthCm}×${S.heightCm} cm`:`${S.heightCm}×${S.widthCm} cm`;
+  setEl('adv-chip-type', TYPE_NAMES[S.type]);
+  setEl('adv-chip-size', chipDimStr);
+  setEl('adv-chip-mat', MAT_NAMES[S.material]||S.material);
+  const fx=[S.advCarbon&&'CN®'].filter(Boolean);
+  setEl('adv-chip-effects', fx.join(' + ')||'Standard');
+}
+
+/* ═══════════════════════════════════════════════════════
+   CANVAS HELPERS
+═══════════════════════════════════════════════════════ */
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+}
+function roundRectFill(ctx,x,y,w,h,r){ roundRect(ctx,x,y,w,h,r); ctx.fill(); }
+function hexToRgba(hex,alpha){
+  if(!hex||!hex.startsWith('#')) return `rgba(0,0,0,${alpha})`;
+  return `rgba(${parseInt(hex.slice(1,3),16)},${parseInt(hex.slice(3,5),16)},${parseInt(hex.slice(5,7),16)},${alpha})`;
+}
+function lighten(hex,p){
+  if(!hex.startsWith('#')) return hex;
+  return `rgb(${Math.min(255,parseInt(hex.slice(1,3),16)+p)},${Math.min(255,parseInt(hex.slice(3,5),16)+p)},${Math.min(255,parseInt(hex.slice(5,7),16)+p)})`;
+}
+function darken(hex,p){
+  if(!hex.startsWith('#')) return hex;
+  return `rgb(${Math.max(0,parseInt(hex.slice(1,3),16)-p)},${Math.max(0,parseInt(hex.slice(3,5),16)-p)},${Math.max(0,parseInt(hex.slice(5,7),16)-p)})`;
+}
+function drawTextWithSpacing(ctx,text,cx,y,ls,underline,sz){
+  const chars=[...text];
+  const widths=chars.map(c=>ctx.measureText(c).width+ls);
+  const total=widths.reduce((a,b)=>a+b,0)-ls;
+  let x=cx-total/2;
+  chars.forEach((c,i)=>{ ctx.fillText(c,x+widths[i]/2,y); x+=widths[i]; });
+  if(underline){
+    ctx.strokeStyle=ctx.fillStyle; ctx.lineWidth=0.8;
+    ctx.beginPath(); ctx.moveTo(cx-total/2,y+1.5); ctx.lineTo(cx+total/2,y+1.5); ctx.stroke();
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   MODAL OPEN / CLOSE
+═══════════════════════════════════════════════════════ */
+function openAdvanced(){
+  document.getElementById('adv-modal-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  const types=['neck','woven','hangtag','heat','sticker','tpu'];
+  document.querySelectorAll('#adv-type-grid .adv-pill').forEach((p,i)=>p.classList.toggle('active',types[i]===S.type));
+  document.querySelectorAll('#adv-size-row .adv-size-btn').forEach(b=>{
+    const t=b.textContent.trim();
+    b.classList.toggle('active',t===`${S.widthCm}×${S.heightCm}`||t===`${S.heightCm}×${S.widthCm}`);
+  });
+  document.getElementById('adv-op').classList.toggle('active',S.orientation==='portrait');
+  document.getElementById('adv-ol').classList.toggle('active',S.orientation==='landscape');
+  const matOrder=['satin','matte','cotton','kraft','clear','recycled'];
+  document.querySelectorAll('#adv-mat-grid .adv-mat-btn').forEach((b,i)=>b.classList.toggle('active',matOrder[i]===S.material||(S.material==='transparent'&&matOrder[i]==='clear')));
+  if(S.logoImg){
+    const src=document.getElementById('logo-preview-img').src;
+    if(src){
+      document.getElementById('adv-logo-preview-img').src=src;
+      document.getElementById('adv-logo-preview-name').textContent=document.getElementById('logo-preview-name').textContent;
+      document.getElementById('adv-logo-preview').style.display='flex';
+    }
+  }
+  advRender();
+}
+function tryCloseAdvanced(){
+  if(S.advDirty){ document.getElementById('confirm-overlay').classList.add('open'); }
+  else { closeAdvanced(); }
+}
+document.getElementById('adv-modal-overlay').addEventListener('click',function(e){ if(e.target===this) tryCloseAdvanced(); });
+function cancelClose(){ document.getElementById('confirm-overlay').classList.remove('open'); }
+function confirmClose(){ document.getElementById('confirm-overlay').classList.remove('open'); closeAdvanced(); }
+function closeAdvanced(){
+  document.getElementById('adv-modal-overlay').classList.remove('open');
+  document.body.style.overflow='';
+  renderLabel();
+}
+
+/* ═══════════════════════════════════════════════════════
+   ACTIONS
+═══════════════════════════════════════════════════════ */
+function buildSpecsData(isAdv){
+  const dimStr = S.orientation==='portrait'?`${S.widthCm} × ${S.heightCm} cm`:`${S.heightCm} × ${S.widthCm} cm`;
+  if(!isAdv){
+    const brandName = document.getElementById('brand-name')?.value||'—';
+    const tagline = document.getElementById('tagline')?.value||'—';
+    const composition = document.getElementById('composition')?.value||'—';
+    const origin = document.getElementById('origin')?.value||'—';
+    const brandSize = document.getElementById('brand-size')?.value||'16';
+    const activeNames = S.sbCareActive.map(id=>CARE_SYMBOLS.find(c=>c.id===id)?.name||id);
+    const fontKey = S.fontFamily.replace(' italic','');
+    return [
+      ['Label Type', TYPE_NAMES[S.type]],
+      ['Dimensions', dimStr],
+      ['Orientation', S.orientation==='portrait'?'Portrait':'Landscape'],
+      ['Material', MATERIAL_NAMES[S.material]||S.material],
+      ['Background Color', S.bgColor.toUpperCase()],
+      ['Text Color', S.textColor.toUpperCase()],
+      ['Font Style', FONT_STYLE_NAMES[fontKey]||'—'],
+      ['Brand Name', brandName],
+      ['Brand Name Size', brandSize+'px'],
+      ['Tagline', tagline],
+      ['Logo Size', S.logoSize+'%'],
+      ['Placement', PLACEMENT_NAMES[S.placement]||'Neck Inside'],
+      ['Composition', composition],
+      ['Country of Origin', origin],
+      ['Size Mark', S.sizeLabel||'—'],
+      ['Care Symbols', activeNames.join(', ')||'—'],
+      ['CarbonNeutral®', S.carbon?'Yes':'No'],
+      ['Min. Order', '500 pcs'],
+      ['Turnaround', '7–10 days'],
+    ];
+  } else {
+    const brandTxt = document.getElementById('adv-brand-text')?.value||'—';
+    const tagTxt = document.getElementById('adv-tagline-text')?.value||'—';
+    const composition = S.blocks.find(b=>b.id==='composition')?.value||'—';
+    const origin = S.blocks.find(b=>b.id==='origin')?.value||'—';
+    const sizelabel = S.blocks.find(b=>b.id==='sizelabel')?.value||'—';
+    const activeNames = S.careActive.map(id=>CARE_SYMBOLS.find(c=>c.id===id)?.name||id);
+    return [
+      ['Label Type', TYPE_NAMES[S.type]],
+      ['Dimensions', dimStr],
+      ['Orientation', S.orientation==='portrait'?'Portrait':'Landscape'],
+      ['Material', MATERIAL_NAMES[S.material]||S.material],
+      ['Border Style', S.advBorderStyle.charAt(0).toUpperCase()+S.advBorderStyle.slice(1)],
+      ['Background Color', S.advBgColor.toUpperCase()],
+      ['Text Color', S.advTextColor.toUpperCase()],
+      ['Font Style', FONT_STYLE_NAMES[S.advFontFamily]||S.advFontFamily.split(',')[0]],
+      ['Brand Name', brandTxt],
+      ['Brand Name Size', S.brandSize+'px'],
+      ['Logo Size', S.advLogoSize+'%'],
+      ['Tagline', tagTxt],
+      ['Placement', PLACEMENT_NAMES[S.advPlacement]||'Neck Inside'],
+      ['Composition', composition],
+      ['Country of Origin', origin],
+      ['Size Mark', sizelabel],
+      ['Care Symbols', activeNames.join(', ')||'—'],
+      ['CarbonNeutral®', S.advCarbon?'Yes':'No'],
+      ['Min. Order', '500 pcs'],
+      ['Turnaround', '7–10 days'],
+    ];
+  }
+}
+function downloadSpecsPDF(specs, labelName, canvasEl){
+  const { jsPDF } = window.jspdf;
+  if(!jsPDF){ alert('PDF library not loaded yet. Please try again.'); return; }
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  const pageW = doc.internal.pageSize.getWidth();
+
+  // Header
+  doc.setFillColor(14, 61, 80);
+  doc.rect(0, 0, pageW, 30, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(18); doc.setFont('helvetica','bold');
+  doc.text('SolTrim International', 20, 13);
+  doc.setFontSize(10); doc.setFont('helvetica','normal');
+  doc.text('Label Design Specifications', 20, 21);
+  doc.setTextColor(245, 166, 35);
+  doc.setFontSize(9);
+  doc.text(new Date().toLocaleDateString('en-GB',{year:'numeric',month:'long',day:'numeric'}), pageW-20, 21, {align:'right'});
+
+  // Label image
+  let y = 40;
+  try {
+    const imgData = canvasEl.toDataURL('image/png');
+    const cw = canvasEl.width, ch = canvasEl.height;
+    const maxW = 55, maxH = 70;
+    const scale = Math.min(maxW/cw, maxH/ch);
+    const iw = cw*scale, ih = ch*scale;
+    doc.addImage(imgData, 'PNG', pageW/2 - iw/2, y, iw, ih);
+    y += ih + 8;
+  } catch(e){}
+
+  // Title
+  doc.setTextColor(14, 61, 80); doc.setFontSize(13); doc.setFont('helvetica','bold');
+  doc.text('Label Specifications — ' + labelName, pageW/2, y, {align:'center'});
+  y += 8;
+
+  // Specs table
+  const col1 = 20, col2 = 90, rowH = 7;
+  let rowIdx = 0;
+  specs.forEach(([label, value]) => {
+    if(rowIdx % 2 === 0){ doc.setFillColor(240, 247, 251); doc.rect(col1-2, y-4.5, pageW-col1*2+4, rowH, 'F'); }
+    doc.setTextColor(107, 136, 153); doc.setFontSize(8); doc.setFont('helvetica','bold');
+    doc.text(label.toUpperCase(), col1, y);
+    doc.setTextColor(26, 46, 59); doc.setFontSize(9); doc.setFont('helvetica','normal');
+    doc.text(String(value), col2, y);
+    y += rowH; rowIdx++;
+    if(y > 270){ doc.addPage(); y = 20; rowIdx = 0; }
+  });
+
+  // Footer
+  y = doc.internal.pageSize.getHeight() - 14;
+  doc.setFillColor(14, 61, 80); doc.rect(0, y-4, pageW, 18, 'F');
+  doc.setTextColor(255,255,255); doc.setFontSize(8); doc.setFont('helvetica','normal');
+  doc.text('SolTrim International — Asia\'s First CarbonNeutral® Label Manufacturer', pageW/2, y+4, {align:'center'});
+  doc.text('www.soltrim.com', pageW/2, y+9, {align:'center'});
+
+  doc.save(labelName.toLowerCase().replace(/\s/g,'-')+'-specs.pdf');
+}
+function downloadPNG(){
+  const canvas=document.getElementById('label-canvas');
+  const a=document.createElement('a');
+  a.download='soltrim-label.png'; a.href=canvas.toDataURL('image/png'); a.click();
+  setTimeout(()=>{ downloadSpecsPDF(buildSpecsData(false), 'Simple Builder Label', canvas); }, 300);
+}
+function advDownload(){
+  const canvas=document.getElementById('adv-canvas');
+  const a=document.createElement('a');
+  a.download='soltrim-label-pro.png'; a.href=canvas.toDataURL('image/png'); a.click();
+  setTimeout(()=>{ downloadSpecsPDF(buildSpecsData(true), 'Pro Builder Label', canvas); }, 300);
+}
+function resetDesign(){
+  if(!confirm('Reset all customisations?')) return;
+  location.reload();
+}
+function advReset(){
+  if(!confirm('Reset all Pro Builder customisations?')) return;
+  S.advBgColor='#ffffff'; S.advBorderStyle='none';
+  S.advLogoSize=55; S.advLogoX=0; S.advLogoY=0;
+  S.brandBold=false; S.brandItalic2=false; S.brandUnderline=false; S.brandUpper=false;
+  S.brandSize=16; S.brandLS=0;
+  S.tagBold=false; S.tagItalic=false; S.tagUnderline=false; S.tagUpper=false;
+  S.tagSize=10; S.tagLH=1.4;
+  S.advTextColor='#1a2e3b'; S.advFontFamily='Arial, sans-serif';
+  S.careActive=[];
+  S.advCarbon=true;
+  S.blocks.forEach(b=>{ b.value=''; b.visible=true; });
+  document.getElementById('adv-brand-text').value='';
+  document.getElementById('adv-tagline-text').value='';
+  document.getElementById('adv-logo-size').value=55;
+  document.getElementById('adv-logo-x').value=0;
+  document.getElementById('adv-logo-y').value=0;
+  document.getElementById('adv-bn-size').value=16;
+  document.getElementById('adv-bn-ls').value=0;
+  document.getElementById('adv-tg-size').value=10;
+  document.getElementById('adv-tg-lh').value=1.4;
+  document.querySelectorAll('.adv-rt-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('adv-t-carbon').classList.add('on');
+  document.querySelectorAll('.adv-care-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#adv-bg-colors .adv-swatch').forEach((s,i)=>s.classList.toggle('active',i===0));
+  document.querySelectorAll('.adv-border-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+  renderBlockList();
+  renderCareActiveList();
+  S.advDirty=false; advRender();
+}
+
+/* ═══════════════════════════════════════════════════════
+   QUOTE MODAL
+═══════════════════════════════════════════════════════ */
+function openQuote(){
+  // Detect if Pro Builder is open
+  const isAdv = document.getElementById('adv-modal-overlay').classList.contains('open');
+  const canvas = isAdv ? document.getElementById('adv-canvas') : document.getElementById('label-canvas');
+  const specs = buildSpecsData(isAdv);
+
+  // Label image
+  const img = document.getElementById('quote-canvas-preview');
+  img.src = canvas.toDataURL('image/png');
+  img.style.display = 'block';
+  // Scale preview to max 100px height
+  const scale = Math.min(100/canvas.height, 70/canvas.width);
+  img.style.width = (canvas.width*scale)+'px';
+  img.style.height = (canvas.height*scale)+'px';
+
+  // Full specs in panel
+  const specsEl = document.getElementById('quote-specs-inline');
+  specsEl.innerHTML = specs.map(([k,v])=>`<b>${k}:</b> ${v}`).join('<br>');
+
+  document.getElementById('quote-overlay').classList.add('open');
+}
+function closeQuote(){ document.getElementById('quote-overlay').classList.remove('open'); }
+document.getElementById('quote-overlay').addEventListener('click',function(e){ if(e.target===this) closeQuote(); });
+function submitQuote(){
+  const name=document.getElementById('q-name').value;
+  const email=document.getElementById('q-email').value;
+  if(!name||!email){ alert('Please enter your name and email.'); return; }
+  alert(`Thank you, ${name}! Your quote request has been received. The SolTrim team will contact you at ${email} within 24 hours.`);
+  closeQuote();
+}
+
+/* ═══════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════ */
+initCareSB();
+initCareAdv();
+renderCareActiveList();
+initBlockList();
+renderLabel();
+</script>
+</body>
+</html>

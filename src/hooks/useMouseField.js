@@ -1,30 +1,25 @@
 // src/hooks/useMouseField.js
-// Applies a magnetic field effect to an array of DOM nodes.
-// Nodes within RADIUS px of the cursor drift toward it.
-// Uses gsap.quickTo for butter-smooth GPU-composited motion.
+// Magnetic cursor field — nodes within RADIUS px drift toward the mouse.
+// Uses getBoundingClientRect so it always reads the true rendered position
+// (after any CSS animation offset) rather than a stale positions map.
+// quickTo for butter-smooth GPU-composited motion.
 
 import { useEffect } from 'react'
 import { gsap } from '../utils/gsap'
 
-const RADIUS       = 200    // px — influence radius
-const MAX_PULL     = 24     // px — max displacement at cursor center
-const RETURN_EASE  = 'elastic.out(1, 0.45)'
-const RETURN_DUR   = 1.1
-const PULL_DUR     = 0.35
+const RADIUS      = 200    // px — influence radius
+const MAX_PULL    = 26     // px — max displacement at cursor centre
+const RETURN_EASE = 'elastic.out(1, 0.45)'
+const RETURN_DUR  = 1.1
+const PULL_DUR    = 0.32
 
-/**
- * @param {React.RefObject} containerRef  - the section container
- * @param {React.RefObject<Array>} nodeRefs - array of DOM node refs
- * @param {React.RefObject<Object>} basePositions - { [id]: {cx, cy} } map
- * @param {boolean} enabled
- */
 export function useMouseField(containerRef, nodeRefs, basePositions, enabled = true) {
   useEffect(() => {
     if (!enabled) return
     const container = containerRef.current
     if (!container) return
 
-    // Build quickTo settlers lazily per node
+    // Lazily build quickTo settlers per DOM element
     const settlers = new WeakMap()
     const pulled    = new Set()
 
@@ -39,26 +34,21 @@ export function useMouseField(containerRef, nodeRefs, basePositions, enabled = t
     }
 
     const onMove = (e) => {
-      const rect = container.getBoundingClientRect()
-      const mx   = e.clientX - rect.left
-      const my   = e.clientY - rect.top
+      const containerRect = container.getBoundingClientRect()
+      const mx = e.clientX - containerRect.left
+      const my = e.clientY - containerRect.top
 
-      const nodes = nodeRefs.current
-      if (!nodes?.length) return
-
-      nodes.forEach((el, i) => {
+      nodeRefs.current.forEach((el) => {
         if (!el) return
-        const pos = Object.values(basePositions.current || {})[i]
-        if (!pos) return
 
-        // Use the node's DOM position as base if positions map isn't indexed by i
+        // Read the node's actual rendered centre (includes CSS float animation offset)
         const elRect = el.getBoundingClientRect()
-        const bx = elRect.left - rect.left + elRect.width / 2
-        const by = elRect.top  - rect.top  + elRect.height / 2
+        const bx = elRect.left - containerRect.left + elRect.width  / 2
+        const by = elRect.top  - containerRect.top  + elRect.height / 2
 
         const dx   = mx - bx
         const dy   = my - by
-        const dist = Math.sqrt(dx * dx + dy * dy)
+        const dist = Math.hypot(dx, dy)
 
         const { xTo, yTo } = getSettler(el)
 
@@ -87,7 +77,6 @@ export function useMouseField(containerRef, nodeRefs, basePositions, enabled = t
     return () => {
       container.removeEventListener('mousemove', onMove)
       container.removeEventListener('mouseleave', onLeave)
-      // Return all nodes to origin on cleanup
       nodeRefs.current?.forEach(el => el && gsap.set(el, { x: 0, y: 0 }))
     }
   }, [enabled])

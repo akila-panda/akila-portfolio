@@ -12,14 +12,40 @@ import layer5 from '../assets/blob/layer-5.png'
 
 const BLOB_LAYERS = [layer1, layer2, layer3, layer4, layer5]
 
-const TRAIL = [
-  { label: 'Into the Prompt',  bg: 'linear-gradient(135deg,#e8a020 0%,#b36800 100%)' },
-  { label: 'MotionLANG',       bg: 'linear-gradient(135deg,#1a1a2e 0%,#3dba7e 100%)' },
-  { label: 'DocMIND',          bg: 'linear-gradient(135deg,#2d1b69 0%,#7c3aed 100%)' },
-  { label: 'SolTrim',          bg: 'linear-gradient(135deg,#1c1c1c 0%,#3a3530 100%)' },
-  { label: 'AI Engineering',   bg: 'linear-gradient(135deg,#0a2a1a 0%,#1a6640 100%)' },
-  { label: 'AR · 2025',        bg: 'linear-gradient(135deg,#1a1008 0%,#e8a020 100%)' },
+// Code tokens that represent the tech identity — spawned as cursor particles
+const CODE_TOKENS = [
+  // JS / TS syntax
+  '</>',  '{}',    '=>',    'fn()',   'const',  'let',
+  'var',  '[ ]',   '//',    'null',   '&&',     '??',
+  'async','return','await', 'true',   'false',  'void',
+  '!==',  '===',   '...',   '||',     '++',     '--',
+  '?.', 'typeof', 'new',   'class',  'export', 'import',
+
+  // CSS / design tokens
+  ':root', 'px',   'rem',   'vh',     'vw',     'em',
+  '%',    'grid', 'flex',  '@media', 'z-index','var()',
+  '#fff', 'rgba()','0deg', 'auto',   'clip',   'mask',
+
+  // Terminal / git / tooling
+  'git',  'npm',   'npx',   '~/',     'cd ..',  'ls -a',
+  '$_',   '&&',    '||',    'EOF',    '.env',   'CLI',
+  'push', 'pull',  'diff',  'stash',  'HEAD',   'main',
+
+  // AI / infra / architecture
+  'RAG',  'NIM',   'API',   'SSR',    'SSG',    'ISR',
+  'LLM',  'token', 'embed', 'vector', 'prompt', 'ctx',
+  'JWT',  'OAuth', 'REST',  'gRPC',   'WS',     'CDN',
+  'DNS',  'CORS',  'CI/CD', 'docker', 'k8s',    'λ',
+
+  // React / framework
+  'hook', 'memo',  'ref',   'state',  'props',  'ctx',
+  'use()', 'effect','store','slice',  'render', 'hydrate',
+
+  // Fun / symbolic
+  '∞',    '✦',     '⌘',     '⚡',     '···',    '0x',
 ]
+// Colour palette — amber, muted teal, soft purple, off-white
+const TOKEN_COLORS = ['#e8a020', '#3dba7e', '#9b72e6', '#c8c8c8', '#e8a020', '#3dba7e']
 
 const TICKER = [
   'Frontend Development', '·', 'React.js', '·', 'GSAP', '·',
@@ -121,23 +147,60 @@ export default function Hero() {
       tl.to(ctaRef.current.children, { scale: 1, opacity: 1, y: 0, stagger: 0.08, duration: 0.5, ease: 'expo.out' }, 1.05)
     }, heroRef)
 
-    // ── Image trail ───────────────────────────────────────
+    // ── Code token particle trail ──────────────────────────
     if (!isMobile && !reducedMotion) {
-      const items  = trailRef.current.querySelectorAll(`.${styles.trailItem}`)
-      let trailIdx = 0
-      let lastX = 0, lastY = 0
+      const pool   = trailRef.current.querySelectorAll(`.${styles.trailItem}`)
+      let poolIdx  = 0
+      let lastX    = 0, lastY = 0
+
+      // Pre-hide all pool items
+      gsap.set(pool, { opacity: 0, scale: 0 })
 
       const onMove = (e) => {
         const dx = e.clientX - lastX
         const dy = e.clientY - lastY
-        if (Math.sqrt(dx * dx + dy * dy) < 32) return
+        if (Math.sqrt(dx * dx + dy * dy) < 28) return
         lastX = e.clientX; lastY = e.clientY
 
-        const item = items[trailIdx % items.length]
-        trailIdx++
-        gsap.killTweensOf(item)
-        gsap.set(item, { x: e.clientX - 100, y: e.clientY - 135, rotation: gsap.utils.random(-14, 14), scale: 1, opacity: 1, zIndex: 50 + (trailIdx % 8) })
-        gsap.to(item,  { opacity: 0, y: e.clientY - 200, scale: 0.88, duration: 1.1, ease: 'power2.out', delay: 0.45 })
+        const el    = pool[poolIdx % pool.length]
+        poolIdx++
+
+        // Pick random token + colour
+        const token = CODE_TOKENS[Math.floor(Math.random() * CODE_TOKENS.length)]
+        const color = TOKEN_COLORS[Math.floor(Math.random() * TOKEN_COLORS.length)]
+        el.textContent = token
+        el.style.color = color
+
+        const scatter = gsap.utils.random(-35, 35)
+        const drift   = gsap.utils.random(80, 150)
+        const rot     = gsap.utils.random(-25, 25)
+
+        gsap.killTweensOf(el)
+        // Snap to cursor, burst in
+        gsap.set(el, {
+          x: e.clientX + scatter,
+          y: e.clientY,
+          scale: 0,
+          opacity: 0,
+          rotation: rot * 0.3,
+        })
+        // Pop in sharply
+        gsap.to(el, {
+          scale:    gsap.utils.random(1.6, 2.4),
+          opacity:  1,
+          duration: 0.12,
+          ease:     'back.out(2)',
+        })
+        // Float up and fade out
+        gsap.to(el, {
+          delay:    0.12,
+          y:        e.clientY - drift,
+          x:        e.clientX + scatter * 2.2,
+          rotation: rot,
+          opacity:  0,
+          duration: gsap.utils.random(2.2, 3.2),
+          ease:     'power2.out',
+        })
       }
 
       const hero = heroRef.current
@@ -220,10 +283,8 @@ export default function Hero() {
       </div>
 
       <div ref={trailRef} className={styles.trail} aria-hidden="true">
-        {TRAIL.map((item, i) => (
-          <div key={i} className={styles.trailItem} style={{ background: item.bg }}>
-            <span className={styles.trailLabel}>{item.label}</span>
-          </div>
+        {Array.from({ length: 30 }).map((_, i) => (
+          <span key={i} className={styles.trailItem} />
         ))}
       </div>
 

@@ -5,7 +5,7 @@ export const projects = [
     type: 'AI Platform',
     desc: 'AI learning platform with an immersive world-map course navigation UI and car dashboard-themed learning interface. Built progress tracking, streaks, quiz scores, waitlist system with GSAP animations, WordPress lead capture, batched email campaigns, and a full admin dashboard.',
     techs: ['React.js', 'GSAP', 'Lenis Scroll', 'WordPress', 'SMTP'],
-    url: 'https://intotheprompt.com',
+    url: null,
   },
   {
     num: '02',
@@ -13,7 +13,7 @@ export const projects = [
     type: 'SaaS / Dev Tool',
     desc: 'Motion extraction engine that reverse-engineers animations from live websites. Headless browser pipeline capturing DOM states during animation frames, normalising output across GSAP, Framer Motion and CSS Keyframes into a Universal Motion Format. Multi-agent AI orchestration via NVIDIA NIM with WCAG 2.1 audit and a Figma plugin bridge.',
     techs: ['NVIDIA NIM', 'GSAP', 'Framer Motion', 'Headless Browser', 'Figma API'],
-    url: 'https://vocaine.com',
+    url: null,
   },
   {
     num: '03',
@@ -25,11 +25,28 @@ export const projects = [
   },
   {
     num: '04',
+    name: 'Vocaine',
+    type: 'E-Commerce / WordPress',
+    desc: 'Full e-commerce platform for a streetwear brand targeting the ambitious and thrill-seekers. Built on WordPress with WooCommerce — includes product listings, collections, a lookbook, collaborations section, cart and account system, and a fully custom theme with animated hero and editorial layouts.',
+    techs: ['WordPress', 'WooCommerce', 'Custom Theme', 'JavaScript', 'CSS'],
+    url: null,
+  },
+  {
+    num: '05',
+    name: 'Glayze Café',
+    type: 'Multi-page Website',
+    desc: 'Multi-page website for a café brand — Cakes & Bakes and Workspace pages. Features an animated hero carousel, interactive cake explorer with layer breakdowns, pricing tables, order contact section, and a workspace/co-working landing. Built with rich GSAP scroll animations and Observer-driven transitions throughout.',
+    techs: ['HTML', 'CSS', 'GSAP', 'ScrollTrigger', 'Observer'],
+    url: null,
+  },
+  {
+    num: '06',
     name: 'SolTrim International',
     type: 'WordPress',
-    desc: "Full corporate website for Asia's first CarbonNeutral® label manufacturer. Multi-page product showcase, media gallery, news section, and an interactive Label Mockup Designer tool built from scratch.",
-    techs: ['WordPress', 'Custom Plugins', 'JavaScript', 'SCSS'],
+    desc: "Full corporate website for Asia's first CarbonNeutral® label manufacturer. Multi-page product showcase, media gallery, news section, and an interactive Label Mockup Designer tool — supporting 6 label types (Woven, Neck, Heat Transfer, Hang Tag, Sticker, TPU), logo upload, care symbols, colour/font/size controls, garment placement previews, PNG export and PDF spec sheets.",
+    techs: ['WordPress', 'Custom Plugins', 'Canvas API', 'jsPDF', 'JavaScript', 'SCSS'],
     url: null,
+    demo: '/soltrim-label-designer.html',
   },
 ]
 
@@ -90,6 +107,17 @@ export const experience = [
       'Translated Figma and Adobe XD designs into clean frontend code across web apps, LMS platforms and internal tools',
     ],
   },
+  {
+    period: 'Jan 2019 — Aug 2019',
+    company: 'i-Context Pvt Ltd',
+    location: 'Colombo, Sri Lanka',
+    role: 'UI/UX Intern',
+    points: [
+      'Designed screens and built prototypes under senior designer guidance',
+      'Used Figma, Adobe XD, Sketch, Illustrator and Photoshop across live projects',
+      'Gained hands-on experience across the full design process from concepts through to prototype testing',
+    ],
+  },
 ]
 
 export const skills = [
@@ -114,7 +142,32 @@ export const skills = [
     items: ['Twilio API', 'Slack API', 'CRM/ERP', 'RESTful APIs', 'Webhooks'],
   },
   {
+    category: 'State Management',
+    items: ['Redux', 'Zustand'],
+  },
+  {
     category: 'Testing',
     items: ['Jest', 'React Testing Library', 'Cypress'],
+  },
+]
+
+export const education = [
+  {
+    degree: 'BEng (Hons) in Software Engineering',
+    institution: 'London Metropolitan University (UK) · ESOFT Metro Campus',
+    period: '2024 — 2025',
+    note: 'Top-up · Final Project: Web-Based Project Management Tool for the Clothing Industry (AI-Powered)',
+  },
+  {
+    degree: 'Bachelor of Information Technology (BIT)',
+    institution: 'University of Colombo · ESOFT Metro Campus',
+    period: '2016 — 2020',
+    note: 'Final Project: Inventory & Stock Management Web Application',
+  },
+  {
+    degree: 'Diploma in IT with E-Commerce',
+    institution: 'ESOFT Metro Campus',
+    period: '2014',
+    note: 'Pearson Certified',
   },
 ]

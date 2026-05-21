@@ -1,83 +1,94 @@
 // src/utils/treeLayout.js
-// Calculates absolute pixel positions for every node in the skills tree.
-// Returns a flat map: { [nodeId]: { x, y, w, h } }
+// Horizontal fan tree layout:
+//   root (top-centre) → 3 branch nodes (spread left/centre/right) → leaf clusters below each branch
+//
+// Coordinate system: absolute pixels, top-left origin.
+// All positions are the node's top-left corner so you can use them directly
+// in { left, top } CSS or as GSAP targets.
 
-export const NODE_W   = 130   // leaf node width
-export const NODE_H   = 36    // leaf node height
-export const BRANCH_W = 160   // branch header width
-export const BRANCH_H = 44    // branch header height
-export const ROOT_W   = 200   // root node width
-export const ROOT_H   = 56    // root node height
+export const ROOT_W    = 210
+export const ROOT_H    = 58
+export const BRANCH_W  = 170
+export const BRANCH_H  = 46
+export const NODE_W    = 128
+export const NODE_H    = 34
 
-// Column X positions (as fractions of container width)
-const ROOT_COL    = 0.08
-const BRANCH_COL  = 0.32
-const LEAF_COL    = 0.56   // leaves start here; can wrap into 2 sub-cols
+// Vertical rhythm
+const ROOT_TOP       = 48      // top padding above root
+const ROOT_TO_BRANCH = 70      // root bottom → branch top
+const BRANCH_TO_LEAF = 52      // branch bottom → first leaf row top
+const LEAF_ROW_GAP   = 10      // vertical gap between leaf rows
+const LEAF_COL_GAP   = 10      // horizontal gap between leaf columns
 
-// Vertical layout constants
-const TOP_PAD     = 60
-const BRANCH_GAP  = 36    // vertical gap between branch groups
-const LEAF_GAP_Y  = 12    // vertical gap between leaf rows within a branch
-const LEAF_GAP_X  = 14    // horizontal gap between leaf columns
+// Horizontal rhythm — branches at fixed fractional x positions
+const BRANCH_CENTRES = [0.18, 0.50, 0.82]   // fraction of container width
 
 /**
- * @param {Array} branches   - skillTree.branches array
- * @param {number} cW        - container pixel width
- * @returns {Object}         - positions map + svgHeight
+ * @param {Array}  branches   - skillTree.branches
+ * @param {number} cW         - container pixel width
+ * @returns {{ positions, svgHeight }}
  */
 export function calculateTreePositions(branches, cW) {
-  if (!cW || cW < 10) return { positions: {}, svgHeight: 600 }
+  if (!cW || cW < 200) return { positions: {}, svgHeight: 700 }
 
   const positions = {}
+  const COLS = 3   // leaf columns per branch
 
-  const rootX   = cW * ROOT_COL
-  const branchX = cW * BRANCH_COL
-  const leafX   = cW * LEAF_COL
-  const leafCols = 2
-  const colW    = NODE_W + LEAF_GAP_X
+  // ── Root node ─────────────────────────────────────────────────
+  const rootX = cW / 2 - ROOT_W / 2
+  const rootY = ROOT_TOP
+  positions['root'] = {
+    x: rootX, y: rootY,
+    cx: rootX + ROOT_W / 2,
+    cy: rootY + ROOT_H / 2,
+  }
 
-  // First pass: calculate height needed per branch
-  const branchHeights = branches.map(branch => {
-    const rows = Math.ceil(branch.nodes.length / leafCols)
-    return Math.max(BRANCH_H, rows * (NODE_H + LEAF_GAP_Y) - LEAF_GAP_Y)
-  })
-
-  const totalBranchH = branchHeights.reduce((a, h) => a + h + BRANCH_GAP, -BRANCH_GAP)
-  const svgHeight    = TOP_PAD * 2 + Math.max(ROOT_H, totalBranchH) + 80
-
-  // Root node — vertically centered
-  const rootY = svgHeight / 2 - ROOT_H / 2
-  positions['root'] = { x: rootX, y: rootY, w: ROOT_W, h: ROOT_H, cx: rootX + ROOT_W / 2, cy: rootY + ROOT_H / 2 }
-
-  // Branch + leaf nodes
-  let cursor = (svgHeight - totalBranchH) / 2
+  // ── Branch nodes ──────────────────────────────────────────────
+  const branchY = rootY + ROOT_H + ROOT_TO_BRANCH
+  const branchCentres = BRANCH_CENTRES.map(f => Math.round(cW * f))
 
   branches.forEach((branch, bi) => {
-    const bH   = branchHeights[bi]
-    const bY   = cursor + bH / 2 - BRANCH_H / 2
-
+    const bCx = branchCentres[bi]
+    const bx  = bCx - BRANCH_W / 2
     positions[branch.id] = {
-      x: branchX, y: bY, w: BRANCH_W, h: BRANCH_H,
-      cx: branchX + BRANCH_W / 2, cy: bY + BRANCH_H / 2
+      x: bx, y: branchY,
+      cx: bCx,
+      cy: branchY + BRANCH_H / 2,
     }
+  })
 
-    // Leaf nodes — 2 columns
+  // ── Leaf nodes ─────────────────────────────────────────────────
+  // Each branch gets its leaves packed in rows of COLS, centred on the branch cx.
+  // We need the tallest branch to know total canvas height.
+  let maxLeafBottom = branchY + BRANCH_H + BRANCH_TO_LEAF
+
+  branches.forEach((branch, bi) => {
+    const bCx     = branchCentres[bi]
+    const count   = branch.nodes.length
+    const cols    = Math.min(COLS, count)
+    const rows    = Math.ceil(count / cols)
+    const clusterW = cols * NODE_W + (cols - 1) * LEAF_COL_GAP
+    const clusterX = bCx - clusterW / 2
+    const leafTop  = branchY + BRANCH_H + BRANCH_TO_LEAF
+
     branch.nodes.forEach((_, ni) => {
-      const col  = ni % leafCols
-      const row  = Math.floor(ni / leafCols)
-      const nx   = leafX + col * colW
-      const totalLeafH = Math.ceil(branch.nodes.length / leafCols) * (NODE_H + LEAF_GAP_Y) - LEAF_GAP_Y
-      const leafStartY = cursor + bH / 2 - totalLeafH / 2
-      const ny   = leafStartY + row * (NODE_H + LEAF_GAP_Y)
+      const col = ni % cols
+      const row = Math.floor(ni / cols)
+      const nx  = clusterX + col * (NODE_W + LEAF_COL_GAP)
+      const ny  = leafTop  + row * (NODE_H + LEAF_ROW_GAP)
 
       positions[`${branch.id}-${ni}`] = {
-        x: nx, y: ny, w: NODE_W, h: NODE_H,
-        cx: nx + NODE_W / 2, cy: ny + NODE_H / 2
+        x: nx, y: ny,
+        cx: nx + NODE_W / 2,
+        cy: ny + NODE_H / 2,
       }
-    })
 
-    cursor += bH + BRANCH_GAP
+      const bottom = ny + NODE_H
+      if (bottom > maxLeafBottom) maxLeafBottom = bottom
+    })
   })
+
+  const svgHeight = maxLeafBottom + 60   // bottom padding
 
   return { positions, svgHeight }
 }

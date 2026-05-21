@@ -69,6 +69,31 @@
 
 .links a:hover { color: var(--text); }
 
+.navRight {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.4rem;
+}
+
+.cvBtn {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--text);
+  padding: 0.45rem 1rem;
+  border-radius: 2px;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.cvBtn:hover {
+  background: var(--color-accent);
+  color: var(--bg);
+}
+
 .status {
   display: inline-flex;
   align-items: center;
@@ -113,4 +138,5 @@
   .nav    { padding: 1rem 1.5rem; }
   .links  { display: none; }
   .status { display: none; }
+  .cvBtn  { display: none; }
 }

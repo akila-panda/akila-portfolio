@@ -84,7 +84,7 @@ export default function Contact() {
   return (
     <section ref={sectionRef} className={styles.contact} id="contact">
 
-      <div ref={labelRef} className={styles.label}>005 — Contact</div>
+      <div ref={labelRef} className={styles.label}>006 — Contact</div>
 
       <div className={styles.emailWrap}>
         <a
