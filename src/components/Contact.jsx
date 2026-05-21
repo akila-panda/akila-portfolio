@@ -114,7 +114,7 @@ export default function Contact() {
 
         <div ref={socialsRef} className={styles.socials}>
           <a
-            href="https://github.com/"
+            href="https://github.com/akila-panda"
             target="_blank"
             rel="noreferrer"
             className={styles.socialLink}
