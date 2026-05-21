@@ -93,8 +93,30 @@
 }
 
 /* ── Mobile ── */
-@media (max-width: 600px) {
-  .loader { padding: 1.5rem 1.5rem 2rem; }
+@media (max-width: 768px) {
+  .loader       { padding: 1.5rem 1.5rem 2rem; }
+
+  /* Scale name chars to fit 5 letters across the screen */
+  .nameRow      { gap: 0; justify-content: space-between; }
+  .char {
+    font-size: clamp(3.8rem, 17vw, 7rem);
+    letter-spacing: clamp(1px, 1vw, 6px);
+  }
+
+  .sub {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    line-height: 1.7;
+  }
+
+  .logo, .counter { font-size: 10px; }
+}
+
+@media (max-width: 400px) {
+  .char {
+    font-size: clamp(3rem, 18vw, 4.5rem);
+    letter-spacing: 0px;
+  }
 }
 /* ── Blob exit overlay ── */
 .blobOverlay {

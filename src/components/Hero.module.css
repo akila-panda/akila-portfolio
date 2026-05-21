@@ -252,13 +252,49 @@
 /* ── Mobile ── */
 @media (max-width: 768px) {
   .hero         { padding: 1rem 1.5rem 0; }
-  .infoBar      { padding-top: 5rem; padding-bottom: 1.5rem; }
+  .infoBar      { padding-top: 5rem; padding-bottom: 1rem; }
   .infoRight    { display: none; }
-  .heroBottom   { flex-direction: column; align-items: flex-start; }
   .trail        { display: none; }
-  .nameMeta     { flex-direction: column; gap: 0.25rem; }
+
+  /* Name: shrink font + kill fixed 20px letter-spacing that blows the layout */
+  .nameFirst    { gap: 0; }
+  .firstChar {
+    font-size: clamp(3.8rem, 17vw, 7rem);
+    letter-spacing: clamp(2px, 1.5vw, 10px);
+  }
+
+  /* Surname + role */
+  .nameMeta     { flex-direction: column; gap: 0.15rem; padding-top: 0.25rem; }
   .role         { order: 1; }
-  .nameLast     { order: 0; text-align: left; }
+  .nameLast {
+    order: 0;
+    font-size: clamp(1.6rem, 7vw, 3rem);
+    line-height: 1.3;
+    text-align: left;
+  }
+
+  /* Bottom: stack vertically */
+  .heroBottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.2rem;
+    padding-top: 1.2rem;
+  }
+  .desc         { font-size: 11px; max-width: 100%; }
+  .cta          { width: 100%; gap: 1rem; }
+  .btnPrimary   { flex: 1; text-align: center; padding: 0.85rem 1rem; }
+
+  /* Ticker */
+  .ticker       { height: 38px; }
+  .tickerItem   { font-size: 9px; }
+}
+
+@media (max-width: 400px) {
+  .firstChar {
+    font-size: clamp(3rem, 18vw, 4.5rem);
+    letter-spacing: 1px;
+  }
+  .nameLast { font-size: clamp(1.4rem, 8vw, 2.2rem); }
 }
 /* ── Hero blob overlay (scroll-contracts on entry) ── */
 .heroBlobOverlay {

@@ -31,7 +31,7 @@
   --serif:   'Fraunces', serif;
 
   /* type scale */
-  --t-hero:  clamp(8rem, 17vw, 22rem);   /* AKILA display */
+  --t-hero:  clamp(4rem, 17vw, 22rem);   /* AKILA display */
   --t-xl:    clamp(3.5rem, 7vw, 9rem);   /* section headlines */
   --t-l:     clamp(2rem, 4vw, 5rem);
   --t-m:     clamp(1.2rem, 2vw, 1.8rem);
